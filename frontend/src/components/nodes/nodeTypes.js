@@ -1,4 +1,3 @@
-// frontend/src/components/nodes/nodeTypes.js
 import InputNode from './InputNode';
 import OutputNode from './OutputNode';
 import TextNode from './TextNode';

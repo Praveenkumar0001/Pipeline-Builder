@@ -1,4 +1,3 @@
-// frontend/src/components/nodes/OutputNode.jsx
 import React, { useState } from 'react';
 import { Download, Save, Share2, FileText } from 'lucide-react';
 import BaseNode from './BaseNode';
@@ -208,5 +207,4 @@ const OutputNode = ({ id, data, selected }) => {
   );
 };
 
-// Default export for consistency
 export default OutputNode;

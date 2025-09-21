@@ -1,4 +1,3 @@
-// frontend/src/components/nodes/LLMNode.jsx
 import React, { useState } from 'react';
 import { Brain, Settings } from 'lucide-react';
 import BaseNode from './BaseNode';

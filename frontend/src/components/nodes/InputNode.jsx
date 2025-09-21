@@ -1,4 +1,3 @@
-// frontend/src/components/nodes/InputNode.jsx
 import React, { useState } from 'react';
 import { Upload, File, Database, Link } from 'lucide-react';
 import BaseNode from './BaseNode';

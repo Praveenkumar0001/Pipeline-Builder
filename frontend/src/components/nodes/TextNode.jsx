@@ -1,4 +1,3 @@
-// frontend/src/components/nodes/TextNode.jsx
 import React, { useState, useEffect, useCallback, memo, useRef } from 'react';
 import { Type } from 'lucide-react';
 import BaseNode from './BaseNode';

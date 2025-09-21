@@ -1,4 +1,3 @@
-// frontend/src/components/nodes/CustomNodes.jsx
 import React from 'react';
 import { Handle, Position } from 'reactflow';
 
@@ -459,7 +458,6 @@ export const CustomNode = ({ id, data }) => {
   );
 };
 
-// Make sure all components have display names for debugging
 FilterNode.displayName = 'FilterNode';
 TransformNode.displayName = 'TransformNode';
 MathNode.displayName = 'MathNode';

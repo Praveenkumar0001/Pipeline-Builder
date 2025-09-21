@@ -8,9 +8,8 @@ const useStore = create((set, get) => ({
   isLoading: false,
   error: null,
   pipelineResult: null,
-  deletedHistory: [], // For undo functionality
+  deletedHistory: [],
 
-  // Enhanced node operations with delete handling
   onNodesChange: (changes) => {
     set((state) => {
       // Handle delete changes specially to store in history

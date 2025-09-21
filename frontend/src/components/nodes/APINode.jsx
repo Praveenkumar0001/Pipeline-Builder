@@ -1,4 +1,4 @@
-// frontend/src/components/nodes/APINode.jsx
+
 import React, { useState } from 'react';
 import { Globe, Key, Settings, Send } from 'lucide-react';
 import BaseNode from './BaseNode';

@@ -1,4 +1,3 @@
-// frontend/src/components/nodes/NewNodeTypes.jsx
 import React, { useState } from 'react';
 import { 
   Mail, 
