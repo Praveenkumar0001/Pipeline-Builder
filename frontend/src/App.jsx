@@ -18,7 +18,7 @@ import Toolbar from './components/ui/Toolbar';
 import SubmitButton from './components/ui/SubmitButton';
 import PipelineStatus from './components/ui/PipelineStatus';
 import useStore from './store/useStore';
-
+import DeleteToolbar from './components/ui/DeleteToolbar';
 // Import icons
 import {
   Database,
@@ -300,14 +300,20 @@ const Flow = () => {
   const reactFlowWrapper = useRef(null);
   
   const {
-    nodes,
-    edges,
-    onNodesChange,
-    onEdgesChange,
-    addNode,
-    setEdges,
-    exportPipeline
-  } = useStore();
+  nodes,
+  edges,
+  onNodesChange,
+  onEdgesChange,
+  addNode,
+  setEdges,
+  exportPipeline,
+  deleteSelected,
+  deleteAll,
+  undoDelete,
+  selectAll,
+  clearSelection,
+  deletedHistory
+} = useStore();
 
   const { screenToFlowPosition } = useReactFlow();
 
@@ -552,7 +558,18 @@ const Flow = () => {
       <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 pointer-events-auto">
         <SubmitButton />
       </div>
-
+<div className="fixed bottom-6 right-6 z-40 pointer-events-auto">
+  <DeleteToolbar
+    nodes={nodes}
+    edges={edges}
+    onDeleteSelected={deleteSelected}
+    onDeleteAll={deleteAll}
+    onUndoDelete={undoDelete}
+    onSelectAll={selectAll}
+    onClearSelection={clearSelection}
+    deletedHistory={deletedHistory}
+  />
+</div>
       {/* Progress Indicator - Enhanced */}
       {nodes.length > 0 && (
         <div className="fixed top-24 left-1/2 transform -translate-x-1/2 z-20 pointer-events-none">
@@ -602,5 +619,6 @@ function App() {
     </div>
   );
 }
+
 
 export default App;

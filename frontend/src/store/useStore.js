@@ -8,22 +8,84 @@ const useStore = create((set, get) => ({
   isLoading: false,
   error: null,
   pipelineResult: null,
+  deletedHistory: [], // For undo functionality
 
-  // Node operations
+  // Enhanced node operations with delete handling
   onNodesChange: (changes) => {
-    set((state) => ({
-      nodes: applyNodeChanges(changes, state.nodes),
-      error: null // Clear errors when nodes change
-    }));
+    set((state) => {
+      // Handle delete changes specially to store in history
+      const deleteChanges = changes.filter(change => change.type === 'remove');
+      const otherChanges = changes.filter(change => change.type !== 'remove');
+      
+      // Store deleted nodes in history for undo
+      if (deleteChanges.length > 0) {
+        const deletedNodes = deleteChanges.map(change => 
+          state.nodes.find(node => node.id === change.id)
+        ).filter(Boolean);
+        
+        const connectedEdges = state.edges.filter(edge =>
+          deleteChanges.some(change => 
+            edge.source === change.id || edge.target === change.id
+          )
+        );
+
+        const newHistory = [...state.deletedHistory, {
+          type: 'reactflow_nodes',
+          nodes: deletedNodes,
+          edges: connectedEdges,
+          timestamp: Date.now()
+        }];
+
+        return {
+          nodes: applyNodeChanges(changes, state.nodes),
+          edges: state.edges.filter(edge =>
+            !deleteChanges.some(change => 
+              edge.source === change.id || edge.target === change.id
+            )
+          ),
+          deletedHistory: newHistory.slice(-10), // Keep last 10 deletions
+          error: null
+        };
+      }
+
+      return {
+        nodes: applyNodeChanges(changes, state.nodes),
+        error: null
+      };
+    });
   },
 
   onEdgesChange: (changes) => {
-    set((state) => ({
-      edges: applyEdgeChanges(changes, state.edges),
-      error: null // Clear errors when edges change
-    }));
+    set((state) => {
+      // Handle delete changes specially
+      const deleteChanges = changes.filter(change => change.type === 'remove');
+      
+      if (deleteChanges.length > 0) {
+        const deletedEdges = deleteChanges.map(change =>
+          state.edges.find(edge => edge.id === change.id)
+        ).filter(Boolean);
+
+        const newHistory = [...state.deletedHistory, {
+          type: 'reactflow_edges',
+          edges: deletedEdges,
+          timestamp: Date.now()
+        }];
+
+        return {
+          edges: applyEdgeChanges(changes, state.edges),
+          deletedHistory: newHistory.slice(-10),
+          error: null
+        };
+      }
+
+      return {
+        edges: applyEdgeChanges(changes, state.edges),
+        error: null
+      };
+    });
   },
 
+  // Enhanced addNode with proper deletable flags
   addNode: (nodeType, position) => {
     const newNode = {
       id: `${nodeType}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
@@ -32,7 +94,8 @@ const useStore = create((set, get) => ({
       data: getDefaultNodeData(nodeType),
       draggable: true,
       selectable: true,
-      deletable: true,
+      deletable: true, // Enable deletion
+      focusable: true,
     };
 
     console.log('Adding node:', newNode);
@@ -51,22 +114,192 @@ const useStore = create((set, get) => ({
     }));
   },
 
+  // Direct delete methods
   deleteNode: (nodeId) => {
+    set((state) => {
+      const nodeToDelete = state.nodes.find(n => n.id === nodeId);
+      const connectedEdges = state.edges.filter(e => e.source === nodeId || e.target === nodeId);
+      
+      if (nodeToDelete) {
+        const newHistory = [...state.deletedHistory, {
+          type: 'manual_node',
+          node: nodeToDelete,
+          edges: connectedEdges,
+          timestamp: Date.now()
+        }];
+
+        return {
+          nodes: state.nodes.filter(node => node.id !== nodeId),
+          edges: state.edges.filter(edge => edge.source !== nodeId && edge.target !== nodeId),
+          deletedHistory: newHistory.slice(-10)
+        };
+      }
+      return state;
+    });
+  },
+
+  deleteEdge: (edgeId) => {
+    set((state) => {
+      const edgeToDelete = state.edges.find(e => e.id === edgeId);
+      
+      if (edgeToDelete) {
+        const newHistory = [...state.deletedHistory, {
+          type: 'manual_edge',
+          edge: edgeToDelete,
+          timestamp: Date.now()
+        }];
+
+        return {
+          edges: state.edges.filter(edge => edge.id !== edgeId),
+          deletedHistory: newHistory.slice(-10)
+        };
+      }
+      return state;
+    });
+  },
+
+  // Delete selected items
+  deleteSelected: () => {
+    set((state) => {
+      const selectedNodes = state.nodes.filter(n => n.selected);
+      const selectedEdges = state.edges.filter(e => e.selected);
+      const selectedNodeIds = selectedNodes.map(n => n.id);
+      
+      // Find edges connected to selected nodes
+      const connectedEdges = state.edges.filter(e => 
+        selectedNodeIds.includes(e.source) || selectedNodeIds.includes(e.target)
+      );
+
+      if (selectedNodes.length > 0 || selectedEdges.length > 0) {
+        const newHistory = [...state.deletedHistory, {
+          type: 'bulk_delete',
+          nodes: selectedNodes,
+          edges: [...selectedEdges, ...connectedEdges.filter(e => !selectedEdges.includes(e))],
+          timestamp: Date.now()
+        }];
+
+        return {
+          nodes: state.nodes.filter(n => !selectedNodeIds.includes(n.id)),
+          edges: state.edges.filter(e => 
+            !selectedEdges.some(se => se.id === e.id) &&
+            !selectedNodeIds.includes(e.source) && 
+            !selectedNodeIds.includes(e.target)
+          ),
+          deletedHistory: newHistory.slice(-10)
+        };
+      }
+      return state;
+    });
+  },
+
+  // Delete all
+  deleteAll: () => {
+    set((state) => {
+      if (state.nodes.length > 0 || state.edges.length > 0) {
+        const newHistory = [...state.deletedHistory, {
+          type: 'delete_all',
+          nodes: [...state.nodes],
+          edges: [...state.edges],
+          timestamp: Date.now()
+        }];
+
+        return {
+          nodes: [],
+          edges: [],
+          deletedHistory: newHistory.slice(-10)
+        };
+      }
+      return state;
+    });
+  },
+
+  // Undo functionality
+  undoDelete: () => {
+    set((state) => {
+      if (state.deletedHistory.length === 0) return state;
+
+      const lastDeleted = state.deletedHistory[state.deletedHistory.length - 1];
+      
+      switch (lastDeleted.type) {
+        case 'manual_node':
+          return {
+            nodes: [...state.nodes, lastDeleted.node],
+            edges: [...state.edges, ...lastDeleted.edges],
+            deletedHistory: state.deletedHistory.slice(0, -1)
+          };
+        case 'manual_edge':
+          return {
+            edges: [...state.edges, lastDeleted.edge],
+            deletedHistory: state.deletedHistory.slice(0, -1)
+          };
+        case 'reactflow_nodes':
+        case 'bulk_delete':
+          return {
+            nodes: [...state.nodes, ...lastDeleted.nodes],
+            edges: [...state.edges, ...lastDeleted.edges],
+            deletedHistory: state.deletedHistory.slice(0, -1)
+          };
+        case 'reactflow_edges':
+          return {
+            edges: [...state.edges, ...lastDeleted.edges],
+            deletedHistory: state.deletedHistory.slice(0, -1)
+          };
+        case 'delete_all':
+          return {
+            nodes: lastDeleted.nodes,
+            edges: lastDeleted.edges,
+            deletedHistory: state.deletedHistory.slice(0, -1)
+          };
+        default:
+          return state;
+      }
+    });
+  },
+
+  // Selection helpers
+  selectAll: () => {
     set((state) => ({
-      nodes: state.nodes.filter(node => node.id !== nodeId),
-      edges: state.edges.filter(edge => edge.source !== nodeId && edge.target !== nodeId)
+      nodes: state.nodes.map(n => ({ ...n, selected: true })),
+      edges: state.edges.map(e => ({ ...e, selected: true }))
     }));
   },
 
+  clearSelection: () => {
+    set((state) => ({
+      nodes: state.nodes.map(n => ({ ...n, selected: false })),
+      edges: state.edges.map(e => ({ ...e, selected: false }))
+    }));
+  },
+
+  // Enhanced setEdges with proper edge properties
   setEdges: (edgesOrFunction) => {
     if (typeof edgesOrFunction === 'function') {
-      set((state) => ({
-        edges: edgesOrFunction(state.edges),
-        error: null
-      }));
+      set((state) => {
+        const newEdges = edgesOrFunction(state.edges);
+        // Ensure all edges have proper deletion properties
+        const enhancedEdges = newEdges.map(edge => ({
+          ...edge,
+          deletable: true,
+          selectable: true,
+          focusable: true
+        }));
+        
+        return {
+          edges: enhancedEdges,
+          error: null
+        };
+      });
     } else {
+      const enhancedEdges = (Array.isArray(edgesOrFunction) ? edgesOrFunction : [])
+        .map(edge => ({
+          ...edge,
+          deletable: true,
+          selectable: true,
+          focusable: true
+        }));
+        
       set({ 
-        edges: Array.isArray(edgesOrFunction) ? edgesOrFunction : [],
+        edges: enhancedEdges,
         error: null
       });
     }
@@ -74,12 +307,22 @@ const useStore = create((set, get) => ({
 
   // Pipeline operations
   clearPipeline: () => {
-    set({
-      nodes: [],
-      edges: [],
-      error: null,
-      pipelineResult: null,
-      isLoading: false
+    set((state) => {
+      const newHistory = [...state.deletedHistory, {
+        type: 'clear_pipeline',
+        nodes: [...state.nodes],
+        edges: [...state.edges],
+        timestamp: Date.now()
+      }];
+
+      return {
+        nodes: [],
+        edges: [],
+        error: null,
+        pipelineResult: null,
+        isLoading: false,
+        deletedHistory: newHistory.slice(-10)
+      };
     });
   },
 
@@ -93,7 +336,7 @@ const useStore = create((set, get) => ({
         nodeCount: state.nodes.length,
         edgeCount: state.edges.length,
         nodeTypes: [...new Set(state.nodes.map(n => n.type))],
-        version: '2.1'
+        version: '2.2'
       }
     };
   },
@@ -101,18 +344,29 @@ const useStore = create((set, get) => ({
   importPipeline: (pipelineData) => {
     try {
       if (pipelineData && pipelineData.nodes && Array.isArray(pipelineData.nodes)) {
-        // Validate nodes
+        // Validate and enhance nodes with deletion properties
         const validNodes = pipelineData.nodes.filter(node => 
           node.id && node.type && node.position && node.data
-        );
+        ).map(node => ({
+          ...node,
+          draggable: true,
+          selectable: true,
+          deletable: true,
+          focusable: true
+        }));
 
-        // Validate edges
+        // Validate and enhance edges
         const validEdges = Array.isArray(pipelineData.edges) ? 
           pipelineData.edges.filter(edge => 
             edge.id && edge.source && edge.target &&
             validNodes.some(n => n.id === edge.source) &&
             validNodes.some(n => n.id === edge.target)
-          ) : [];
+          ).map(edge => ({
+            ...edge,
+            deletable: true,
+            selectable: true,
+            focusable: true
+          })) : [];
 
         set({
           nodes: validNodes,
@@ -141,10 +395,7 @@ const useStore = create((set, get) => ({
     set({ isLoading: true, error: null });
 
     try {
-      // Simulate analysis delay
       await new Promise(resolve => setTimeout(resolve, 2000 + Math.random() * 1500));
-
-      // Perform pipeline analysis
       const analysis = performPipelineAnalysis(state.nodes, state.edges);
       
       set({ 
@@ -193,7 +444,6 @@ const useStore = create((set, get) => ({
     if (!hasInput) issues.push('Missing input source');
     if (!hasOutput) issues.push('Missing output destination');
 
-    // Check for isolated nodes
     const connectedNodes = new Set();
     edges.forEach(edge => {
       connectedNodes.add(edge.source);
@@ -205,7 +455,6 @@ const useStore = create((set, get) => ({
       issues.push(`${isolatedNodes.length} isolated node(s)`);
     }
 
-    // Check for cycles (simplified check)
     const hasCycle = detectCycle(nodes, edges);
     if (hasCycle) {
       issues.push('Pipeline contains cycles');
@@ -259,6 +508,12 @@ function getDefaultNodeData(nodeType) {
       topic: 'data-stream',
       description: 'Real-time data streaming'
     },
+    webhook: {
+      label: 'Webhook',
+      method: 'POST',
+      endpoint: '/webhook',
+      description: 'Receive HTTP webhooks'
+    },
 
     // Processing
     process: {
@@ -291,18 +546,66 @@ function getDefaultNodeData(nodeType) {
       on: 'id',
       description: 'Join multiple data sources'
     },
+    sort: {
+      label: 'Data Sort',
+      field: 'timestamp',
+      order: 'asc',
+      description: 'Sort data by field'
+    },
+    validate: {
+      label: 'Data Validator',
+      schema: '{}',
+      strict: true,
+      description: 'Validate data schema'
+    },
 
-    // Analysis
+    // AI & ML
+    llm: {
+      label: 'LLM Node',
+      model: 'gpt-4',
+      prompt: 'Process this data',
+      description: 'Large language model processing'
+    },
     ml: {
       label: 'ML Model',
       model: 'linear_regression',
       features: [],
       description: 'Apply machine learning'
     },
+    embedding: {
+      label: 'Text Embeddings',
+      model: 'text-embedding-ada-002',
+      description: 'Generate text embeddings'
+    },
+    sentiment: {
+      label: 'Sentiment Analysis',
+      model: 'vader',
+      description: 'Analyze sentiment'
+    },
+    classification: {
+      label: 'Classifier',
+      model: 'naive_bayes',
+      classes: [],
+      description: 'Classify data'
+    },
+
+    // Analytics
     statistics: {
       label: 'Statistics',
       metrics: ['mean', 'median', 'std'],
       description: 'Statistical analysis'
+    },
+    timeseries: {
+      label: 'Time Series',
+      method: 'arima',
+      periods: 12,
+      description: 'Time series analysis'
+    },
+    anomaly: {
+      label: 'Anomaly Detection',
+      method: 'isolation_forest',
+      threshold: 0.1,
+      description: 'Detect anomalies'
     },
 
     // Outputs
@@ -326,8 +629,14 @@ function getDefaultNodeData(nodeType) {
       recipients: 'admin@example.com',
       description: 'Send alerts and notifications'
     },
+    dashboard: {
+      label: 'Dashboard',
+      layout: 'grid',
+      refresh: 30,
+      description: 'Real-time dashboard'
+    },
 
-    // Media
+    // Media Processing
     image: {
       label: 'Image Processor',
       operation: 'resize',
@@ -345,6 +654,39 @@ function getDefaultNodeData(nodeType) {
       operation: 'normalize',
       format: 'mp3',
       description: 'Process audio files'
+    },
+    ocr: {
+      label: 'OCR Text Extract',
+      language: 'eng',
+      confidence: 0.8,
+      description: 'Extract text from images'
+    },
+
+    // Utilities
+    basenode: {
+      label: 'Base Node',
+      operation: 'custom',
+      description: 'Generic configurable node'
+    },
+    conditional: {
+      label: 'Conditional Logic',
+      condition: 'if-then-else',
+      description: 'Route data conditionally'
+    },
+    delay: {
+      label: 'Delay/Throttle',
+      delay: 1000,
+      description: 'Add processing delays'
+    },
+    batch: {
+      label: 'Batch Processor',
+      batchSize: 100,
+      description: 'Process data in batches'
+    },
+    router: {
+      label: 'Data Router',
+      routes: ['route1', 'route2'],
+      description: 'Route data to multiple outputs'
     }
   };
 
@@ -362,7 +704,6 @@ function performPipelineAnalysis(nodes, edges) {
     nodeTypes[node.type] = (nodeTypes[node.type] || 0) + 1;
   });
 
-  // Check pipeline validity
   const hasInput = nodes.some(node => 
     ['input', 'api', 'database', 'cloud', 'stream'].includes(node.type)
   );
@@ -373,19 +714,16 @@ function performPipelineAnalysis(nodes, edges) {
     ['process', 'filter', 'transform', 'aggregate', 'join', 'ml', 'statistics'].includes(node.type)
   );
 
-  // Calculate complexity
   const complexityScore = nodes.length * 0.5 + edges.length * 0.3;
   let complexity = 'Simple';
   if (complexityScore >= 12) complexity = 'Complex';
   else if (complexityScore >= 6) complexity = 'Moderate';
 
-  // Detect issues
   const issues = [];
   if (!hasInput) issues.push('Missing input nodes');
   if (!hasOutput) issues.push('Missing output nodes');
   if (nodes.length > 1 && edges.length === 0) issues.push('No connections between nodes');
 
-  // Generate recommendations
   const recommendations = [];
   if (!hasProcessing && nodes.length > 2) {
     recommendations.push('Add processing nodes for data transformation');
