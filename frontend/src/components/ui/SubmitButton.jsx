@@ -494,192 +494,224 @@ const StatusIndicator = ({ label, status }) => (
 );
 
 // Pipeline Result Modal
+// Pipeline Result Modal with responsive design
+// Pipeline Result Modal with responsive design
 const PipelineResultModal = ({ result, onClose }) => {
   if (!result) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-300">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-1 sm:p-2 lg:p-4">
+      <div className="bg-white rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-[98vw] sm:max-w-[95vw] lg:max-w-7xl xl:max-w-[90vw] h-full max-h-[98vh] sm:max-h-[95vh] lg:max-h-[92vh] overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-300 flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-100 bg-gradient-to-r from-indigo-50 to-purple-50">
-          <div className="flex items-center space-x-4">
+        <div className="flex items-center justify-between p-4 sm:p-6 lg:p-8 border-b border-gray-100 bg-gradient-to-r from-indigo-50 to-purple-50 flex-shrink-0">
+          <div className="flex items-center space-x-4 sm:space-x-6 min-w-0 flex-1">
             {result.is_dag ? (
-              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                <CheckCircle className="w-6 h-6 text-green-600" />
+              <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <CheckCircle className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-green-600" />
               </div>
             ) : (
-              <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                <XCircle className="w-6 h-6 text-red-600" />
+              <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <XCircle className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-red-600" />
               </div>
             )}
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900">Pipeline Analysis Results</h2>
-              <p className="text-sm text-gray-600">
-                Completed {new Date(result.timestamp).toLocaleString()} • Score: {result.score}/100
+            <div className="min-w-0 flex-1">
+              <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-2">Pipeline Analysis Results</h2>
+              <p className="text-sm sm:text-base lg:text-lg text-gray-600">
+                Completed {new Date(result.timestamp).toLocaleDateString()} at {new Date(result.timestamp).toLocaleTimeString()} • Score: {result.score}/100
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
+            className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors flex-shrink-0 ml-4"
+            title="Close modal"
           >
-            <XCircle className="w-6 h-6 text-gray-400" />
+            <XCircle className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-gray-400" />
           </button>
         </div>
 
-        {/* Content */}
-        <div className="p-6 max-h-[calc(90vh-200px)] overflow-y-auto">
+        {/* Content - Scrollable */}
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
           {/* Statistics Grid */}
-          <div className="grid grid-cols-2 gap-4 mb-6">
-            <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 text-center border border-blue-200">
-              <div className="text-3xl font-bold text-blue-700 mb-1">{result.num_nodes}</div>
-              <div className="text-sm text-blue-600 font-medium">Total Nodes</div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 sm:p-6 text-center border border-blue-200">
+              <div className="text-3xl sm:text-4xl lg:text-5xl font-bold text-blue-700 mb-2">{result.num_nodes}</div>
+              <div className="text-sm sm:text-base lg:text-lg text-blue-600 font-medium">Total Nodes</div>
             </div>
-            <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4 text-center border border-green-200">
-              <div className="text-3xl font-bold text-green-700 mb-1">{result.num_edges}</div>
-              <div className="text-sm text-green-600 font-medium">Connections</div>
+            <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4 sm:p-6 text-center border border-green-200">
+              <div className="text-3xl sm:text-4xl lg:text-5xl font-bold text-green-700 mb-2">{result.num_edges}</div>
+              <div className="text-sm sm:text-base lg:text-lg text-green-600 font-medium">Connections</div>
             </div>
-          </div>
-
-          {/* Analysis Details */}
-          <div className="grid grid-cols-3 gap-4 mb-6">
-            <div className="bg-purple-50 rounded-xl p-4 border border-purple-200 text-center">
-              <div className="text-lg font-bold text-purple-700 mb-1">{result.complexity}</div>
-              <div className="text-sm text-purple-600 font-medium">Complexity</div>
+            <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4 sm:p-6 text-center border border-purple-200">
+              <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-purple-700 mb-2">{result.complexity}</div>
+              <div className="text-sm sm:text-base lg:text-lg text-purple-600 font-medium">Complexity</div>
             </div>
-            <div className="bg-orange-50 rounded-xl p-4 border border-orange-200 text-center">
-              <div className="text-lg font-bold text-orange-700 mb-1">{result.execution_time_estimate}</div>
-              <div className="text-sm text-orange-600 font-medium">Est. Time</div>
-            </div>
-            <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 text-center">
-              <div className="text-lg font-bold text-gray-700 mb-1">{result.memory_estimate}</div>
-              <div className="text-sm text-gray-600 font-medium">Memory</div>
+            <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-4 sm:p-6 text-center border border-orange-200">
+              <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-orange-700 mb-2">{result.execution_time_estimate}</div>
+              <div className="text-sm sm:text-base lg:text-lg text-orange-600 font-medium">Est. Time</div>
             </div>
           </div>
 
-          {/* Status Message */}
-          <div className={`rounded-xl p-4 border-2 mb-6 ${
-            result.score >= 80 
-              ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-200' 
-              : result.score >= 50
-              ? 'bg-gradient-to-r from-yellow-50 to-orange-50 border-yellow-200'
-              : 'bg-gradient-to-r from-red-50 to-pink-50 border-red-200'
-          }`}>
-            <div className="flex items-center space-x-4">
-              <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                result.score >= 80 ? 'bg-green-500' :
-                result.score >= 50 ? 'bg-yellow-500' : 'bg-red-500'
+          {/* Three Column Layout for larger screens */}
+          <div className="grid grid-cols-1 xl:grid-cols-3 lg:grid-cols-2 gap-6 lg:gap-8">
+            {/* Left Column */}
+            <div className="xl:col-span-1 space-y-6">
+              {/* Status Message */}
+              <div className={`rounded-xl p-6 border-2 ${
+                result.score >= 80 
+                  ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-200' 
+                  : result.score >= 50
+                  ? 'bg-gradient-to-r from-yellow-50 to-orange-50 border-yellow-200'
+                  : 'bg-gradient-to-r from-red-50 to-pink-50 border-red-200'
               }`}>
-                {result.score >= 80 ? (
-                  <CheckCircle className="w-6 h-6 text-white" />
-                ) : (
-                  <AlertTriangle className="w-6 h-6 text-white" />
-                )}
-              </div>
-              <div className="flex-1">
-                <div className={`text-xl font-bold ${
-                  result.score >= 80 ? 'text-green-800' :
-                  result.score >= 50 ? 'text-yellow-800' : 'text-red-800'
-                }`}>
-                  Score: {result.score}/100
-                </div>
-                <div className={`text-sm mt-1 ${
-                  result.score >= 80 ? 'text-green-700' :
-                  result.score >= 50 ? 'text-yellow-700' : 'text-red-700'
-                }`}>
-                  {result.message}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Node Types */}
-          {result.node_types && result.node_types.length > 0 && (
-            <div className="mb-6">
-              <h4 className="text-lg font-semibold text-gray-800 mb-3">Node Types in Pipeline</h4>
-              <div className="flex flex-wrap gap-2">
-                {result.node_types.map((type) => (
-                  <span
-                    key={type}
-                    className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-medium capitalize"
-                  >
-                    {type} ({result.node_distribution?.[type] || 1})
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Issues */}
-          {result.issues && result.issues.length > 0 && (
-            <div className="mb-6">
-              <h4 className="text-lg font-semibold text-gray-800 mb-3">Issues Found</h4>
-              <div className="space-y-2">
-                {result.issues.map((issue, index) => (
-                  <div key={index} className="flex items-start space-x-3 p-3 bg-red-50 rounded-lg border border-red-200">
-                    <XCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
-                    <span className="text-red-700 text-sm">{issue}</span>
+                <div className="flex items-center space-x-4">
+                  <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center flex-shrink-0 ${
+                    result.score >= 80 ? 'bg-green-500' :
+                    result.score >= 50 ? 'bg-yellow-500' : 'bg-red-500'
+                  }`}>
+                    {result.score >= 80 ? (
+                      <CheckCircle className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
+                    ) : (
+                      <AlertTriangle className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
+                    )}
                   </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Recommendations */}
-          {result.recommendations && result.recommendations.length > 0 && (
-            <div className="mb-6">
-              <h4 className="text-lg font-semibold text-gray-800 mb-3">Recommendations</h4>
-              <div className="space-y-2">
-                {result.recommendations.map((recommendation, index) => (
-                  <div key={index} className="flex items-start space-x-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                    <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <span className="text-white text-xs font-bold">{index + 1}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className={`text-xl sm:text-2xl lg:text-3xl font-bold mb-2 ${
+                      result.score >= 80 ? 'text-green-800' :
+                      result.score >= 50 ? 'text-yellow-800' : 'text-red-800'
+                    }`}>
+                      Score: {result.score}/100
                     </div>
-                    <span className="text-blue-700 text-sm">{recommendation}</span>
+                    <div className={`text-sm sm:text-base lg:text-lg leading-relaxed ${
+                      result.score >= 80 ? 'text-green-700' :
+                      result.score >= 50 ? 'text-yellow-700' : 'text-red-700'
+                    }`}>
+                      {result.message}
+                    </div>
                   </div>
-                ))}
+                </div>
+              </div>
+
+              {/* Performance Metrics */}
+              <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-6 border border-indigo-200">
+                <h4 className="font-semibold text-indigo-800 mb-4 flex items-center text-lg sm:text-xl">
+                  <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 mr-3" />
+                  Performance Insights
+                </h4>
+                <div className="grid grid-cols-1 gap-3">
+                  <div className="flex justify-between items-center p-3 bg-white/60 rounded-lg">
+                    <span className="text-indigo-700 text-sm sm:text-base">Complexity Score:</span>
+                    <span className="font-bold text-indigo-800 text-sm sm:text-base">{result.complexity_score}</span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-white/60 rounded-lg">
+                    <span className="text-indigo-700 text-sm sm:text-base">DAG Valid:</span>
+                    <span className="font-bold text-indigo-800 text-sm sm:text-base">
+                      {result.is_dag ? '✓ Yes' : '✗ No'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-white/60 rounded-lg">
+                    <span className="text-indigo-700 text-sm sm:text-base">Memory Estimate:</span>
+                    <span className="font-bold text-indigo-800 text-sm sm:text-base">{result.memory_estimate}</span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-white/60 rounded-lg">
+                    <span className="text-indigo-700 text-sm sm:text-base">Has Input:</span>
+                    <span className="font-bold text-indigo-800 text-sm sm:text-base">
+                      {result.has_input ? '✓ Yes' : '✗ No'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-white/60 rounded-lg">
+                    <span className="text-indigo-700 text-sm sm:text-base">Has Output:</span>
+                    <span className="font-bold text-indigo-800 text-sm sm:text-base">
+                      {result.has_output ? '✓ Yes' : '✗ No'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-white/60 rounded-lg">
+                    <span className="text-indigo-700 text-sm sm:text-base">Processing Nodes:</span>
+                    <span className="font-bold text-indigo-800 text-sm sm:text-base">
+                      {result.has_processing ? '✓ Yes' : '✗ No'}
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
-          )}
 
-          {/* Performance Metrics */}
-          <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-4 border border-indigo-200">
-            <h4 className="font-semibold text-indigo-800 mb-3 flex items-center">
-              <TrendingUp className="w-5 h-5 mr-2" />
-              Performance Insights
-            </h4>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div className="flex justify-between">
-                <span className="text-indigo-700">Complexity Score:</span>
-                <span className="font-medium text-indigo-800">{result.complexity_score}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-indigo-700">DAG Valid:</span>
-                <span className="font-medium text-indigo-800">
-                  {result.is_dag ? 'Yes' : 'No'}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-indigo-700">Has Input:</span>
-                <span className="font-medium text-indigo-800">
-                  {result.has_input ? 'Yes' : 'No'}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-indigo-700">Has Output:</span>
-                <span className="font-medium text-indigo-800">
-                  {result.has_output ? 'Yes' : 'No'}
-                </span>
-              </div>
+            {/* Middle Column */}
+            <div className="xl:col-span-1 space-y-6">
+              {/* Node Types */}
+              {result.node_types && result.node_types.length > 0 && (
+                <div>
+                  <h4 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-800 mb-4">Node Types in Pipeline</h4>
+                  <div className="flex flex-wrap gap-3">
+                    {result.node_types.map((type) => (
+                      <span
+                        key={type}
+                        className="px-4 py-2 bg-indigo-100 text-indigo-700 rounded-full text-sm sm:text-base font-medium capitalize border border-indigo-200"
+                      >
+                        {type} ({result.node_distribution?.[type] || 1})
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Node Distribution Details */}
+              {result.node_distribution && (
+                <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                  <h4 className="font-semibold text-gray-800 mb-4 text-lg sm:text-xl">Node Distribution Details</h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {Object.entries(result.node_distribution).map(([type, count]) => (
+                      <div key={type} className="flex justify-between items-center p-3 bg-white rounded-lg shadow-sm">
+                        <span className="capitalize text-gray-600 text-sm sm:text-base font-medium">{type}:</span>
+                        <span className="font-bold text-gray-800 text-lg">{count}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Right Column */}
+            <div className="xl:col-span-1 lg:col-span-2 xl:col-span-1 space-y-6">
+              {/* Issues */}
+              {result.issues && result.issues.length > 0 && (
+                <div>
+                  <h4 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-800 mb-4">Issues Found ({result.issues.length})</h4>
+                  <div className="space-y-3">
+                    {result.issues.map((issue, index) => (
+                      <div key={index} className="flex items-start space-x-4 p-4 bg-red-50 rounded-xl border border-red-200">
+                        <XCircle className="w-6 h-6 text-red-500 flex-shrink-0 mt-1" />
+                        <span className="text-red-700 text-sm sm:text-base leading-relaxed">{issue}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Recommendations */}
+              {result.recommendations && result.recommendations.length > 0 && (
+                <div>
+                  <h4 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-800 mb-4">Recommendations ({result.recommendations.length})</h4>
+                  <div className="space-y-3">
+                    {result.recommendations.map((recommendation, index) => (
+                      <div key={index} className="flex items-start space-x-4 p-4 bg-blue-50 rounded-xl border border-blue-200">
+                        <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <span className="text-white text-sm font-bold">{index + 1}</span>
+                        </div>
+                        <span className="text-blue-700 text-sm sm:text-base leading-relaxed">{recommendation}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="flex justify-end space-x-3 p-6 border-t border-gray-100 bg-gray-50">
+        {/* Footer - Fixed at bottom */}
+        <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3 p-4 sm:p-6 border-t border-gray-100 bg-gray-50 flex-shrink-0">
           <button
             onClick={onClose}
-            className="px-6 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+            className="w-full sm:w-auto px-4 sm:px-6 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium text-sm sm:text-base"
           >
             Close
           </button>
@@ -697,7 +729,7 @@ const PipelineResultModal = ({ result, onClose }) => {
               a.click();
               URL.revokeObjectURL(url);
             }}
-            className="px-6 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-lg hover:from-indigo-600 hover:to-purple-700 transition-all font-medium"
+            className="w-full sm:w-auto px-4 sm:px-6 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-lg hover:from-indigo-600 hover:to-purple-700 transition-all font-medium text-sm sm:text-base"
           >
             Export Analysis
           </button>
@@ -706,5 +738,4 @@ const PipelineResultModal = ({ result, onClose }) => {
     </div>
   );
 };
-
 export default SubmitButton;
