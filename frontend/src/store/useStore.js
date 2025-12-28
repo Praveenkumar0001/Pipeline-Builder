@@ -14,7 +14,6 @@ const useStore = create((set, get) => ({
     set((state) => {
       // Handle delete changes specially to store in history
       const deleteChanges = changes.filter(change => change.type === 'remove');
-      const otherChanges = changes.filter(change => change.type !== 'remove');
       
       // Store deleted nodes in history for undo
       if (deleteChanges.length > 0) {
@@ -110,6 +109,15 @@ const useStore = create((set, get) => ({
       nodes: state.nodes.map(node =>
         node.id === nodeId ? { ...node, data: { ...node.data, ...data } } : node
       )
+    }));
+  },
+
+  // Back-compat alias used by most node components
+  updateNodeData: (nodeId, data) => {
+    set((state) => ({
+      nodes: state.nodes.map((node) =>
+        node.id === nodeId ? { ...node, data: { ...node.data, ...data } } : node
+      ),
     }));
   },
 

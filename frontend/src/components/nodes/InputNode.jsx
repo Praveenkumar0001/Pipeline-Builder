@@ -8,6 +8,9 @@ const InputNode = ({ id, data, selected }) => {
   const [inputName, setInputName] = useState(data?.inputName || 'input_data');
   const [description, setDescription] = useState(data?.description || '');
   const [fileFormat, setFileFormat] = useState(data?.fileFormat || 'json');
+  const [uploadedFile, setUploadedFile] = useState(data?.uploadedFile || null);
+  const [fileContent, setFileContent] = useState(data?.fileContent || null);
+  const [isProcessing, setIsProcessing] = useState(false);
   const updateNodeData = useStore(state => state.updateNodeData);
 
   const handleInputTypeChange = (type) => {
@@ -31,6 +34,72 @@ const InputNode = ({ id, data, selected }) => {
     const format = e.target.value;
     setFileFormat(format);
     updateNodeData(id, { fileFormat: format });
+  };
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsProcessing(true);
+    
+    try {
+      const reader = new FileReader();
+      
+      reader.onload = (event) => {
+        const content = event.target.result;
+        setUploadedFile({
+          name: file.name,
+          size: file.size,
+          type: file.type,
+          lastModified: file.lastModified
+        });
+        setFileContent(content);
+        updateNodeData(id, { 
+          uploadedFile: {
+            name: file.name,
+            size: file.size,
+            type: file.type
+          },
+          fileContent: content,
+          hasData: true
+        });
+        setIsProcessing(false);
+      };
+
+      reader.onerror = () => {
+        alert('Error reading file');
+        setIsProcessing(false);
+      };
+
+      // Read file based on format
+      if (['json', 'csv', 'txt', 'xml'].includes(fileFormat)) {
+        reader.readAsText(file);
+      } else {
+        reader.readAsDataURL(file);
+      }
+    } catch (error) {
+      console.error('File upload error:', error);
+      alert('Failed to upload file');
+      setIsProcessing(false);
+    }
+  };
+
+  const handleClearFile = () => {
+    setUploadedFile(null);
+    setFileContent(null);
+    updateNodeData(id, { 
+      uploadedFile: null,
+      fileContent: null,
+      hasData: false
+    });
+  };
+
+  const formatFileSize = (bytes) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
   };
 
   const getIcon = () => {
@@ -144,6 +213,83 @@ const InputNode = ({ id, data, selected }) => {
           </div>
         )}
 
+        {/* File Upload */}
+        {inputType === 'file' && (
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 mb-2">
+              Upload File
+            </label>
+            
+            {!uploadedFile ? (
+              <div className="relative">
+                <input
+                  type="file"
+                  onChange={handleFileUpload}
+                  accept={
+                    fileFormat === 'json' ? '.json' :
+                    fileFormat === 'csv' ? '.csv' :
+                    fileFormat === 'xlsx' ? '.xlsx,.xls' :
+                    fileFormat === 'txt' ? '.txt' :
+                    fileFormat === 'xml' ? '.xml' :
+                    fileFormat === 'parquet' ? '.parquet' : '*'
+                  }
+                  disabled={isProcessing}
+                  className="hidden"
+                  id={`file-input-${id}`}
+                />
+                <label
+                  htmlFor={`file-input-${id}`}
+                  className={`
+                    flex flex-col items-center justify-center p-6 border-2 border-dashed rounded-lg
+                    transition-all duration-200 cursor-pointer
+                    ${isProcessing 
+                      ? 'border-gray-300 bg-gray-50 cursor-wait' 
+                      : 'border-green-300 bg-green-50 hover:bg-green-100 hover:border-green-400'
+                    }
+                  `}
+                >
+                  <Upload className={`w-8 h-8 mb-2 ${isProcessing ? 'text-gray-400 animate-pulse' : 'text-green-600'}`} />
+                  <span className="text-sm font-medium text-green-700">
+                    {isProcessing ? 'Processing...' : 'Click to upload file'}
+                  </span>
+                  <span className="text-xs text-green-600 mt-1">
+                    {fileFormat.toUpperCase()} format
+                  </span>
+                </label>
+              </div>
+            ) : (
+              <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-start space-x-3 flex-1">
+                    <File className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-green-900 truncate">
+                        {uploadedFile.name}
+                      </p>
+                      <p className="text-xs text-green-600 mt-1">
+                        {formatFileSize(uploadedFile.size)} • {fileFormat.toUpperCase()}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={handleClearFile}
+                    className="ml-2 p-1 text-green-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                    title="Remove file"
+                  >
+                    <Upload className="w-4 h-4 rotate-180" />
+                  </button>
+                </div>
+                <div className="mt-2 pt-2 border-t border-green-200">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <span className="text-xs font-medium text-green-700">File loaded and ready</span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Description */}
         <div>
           <label className="block text-xs font-semibold text-gray-700 mb-2">
@@ -175,10 +321,18 @@ const InputNode = ({ id, data, selected }) => {
                 <span className="font-medium">{inputName || 'Unnamed'}</span>
               </div>
               {inputType === 'file' && (
-                <div className="flex items-center justify-between">
-                  <span>Format:</span>
-                  <span className="font-medium uppercase">{fileFormat}</span>
-                </div>
+                <>
+                  <div className="flex items-center justify-between">
+                    <span>Format:</span>
+                    <span className="font-medium uppercase">{fileFormat}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>Status:</span>
+                    <span className={`font-medium ${uploadedFile ? 'text-green-700' : 'text-orange-600'}`}>
+                      {uploadedFile ? '✓ File Loaded' : '○ No File'}
+                    </span>
+                  </div>
+                </>
               )}
             </div>
           </div>

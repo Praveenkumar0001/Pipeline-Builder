@@ -8,81 +8,30 @@ import {
   XCircle,
   Database,
   Filter,
-  Cpu,
   Globe,
   BarChart3,
   Shuffle,
-  HardDrive,
   FileText,
   Upload,
   Download,
-  Server,
   Cloud,
-  Zap,
   Settings,
   Mail,
-  MessageSquare,
   Image,
-  Video,
-  Music,
   Brain,
   Code,
-  Network,
   Hash,
-  Eye,
-  Shield,
   GitBranch,
   Timer,
   Layers,
-  Target,
-  Workflow,
   Radio,
-  MonitorSpeaker,
   Trash2,
-  Info,
   Wand2,
   Save,
-  Palette,
   CircleDot,
   Square
 } from 'lucide-react';
 import useStore from '../../store/useStore';
-
-// Import existing node components
-import BaseNode from '../nodes/BaseNode';
-import TextNode from '../nodes/TextNode';
-import InputNode from '../nodes/InputNode';
-import OutputNode from '../nodes/OutputNode';
-import LLMNode from '../nodes/LLMNode';
-import APINode from '../nodes/APINode';
-import { 
-  FilterNode, 
-  TransformNode, 
-  MathNode, 
-  DocumentNode, 
-  DatabaseNode, 
-  JoinNode, 
-  AggregateNode, 
-  CustomNode 
-} from '../nodes/CustomNodes';
-
-// Node type registry from existing components
-const existingNodeComponents = {
-  basenode: BaseNode,
-  text: TextNode,
-  input: InputNode,
-  output: OutputNode,
-  llm: LLMNode,
-  api: APINode,
-  filter: FilterNode,
-  transform: TransformNode,
-  math: MathNode,
-  document: DocumentNode,
-  database: DatabaseNode,
-  join: JoinNode,
-  aggregate: AggregateNode,
-  custom: CustomNode
-};
 
 // Comprehensive node categories with existing and enhanced types
 const nodeCategories = {
@@ -275,6 +224,53 @@ const nodeCategories = {
       handles: { source: true, target: true },
       component: 'CustomNode'
     }
+  ],
+  'Demo Nodes (Part 1)': [
+    { 
+      type: 'email', 
+      label: 'Email Sender', 
+      description: 'Configure and send emails via SMTP, SendGrid, or Mailgun', 
+      icon: Mail,
+      color: 'from-green-500 to-emerald-600',
+      handles: { source: true, target: true },
+      component: 'EmailNode'
+    },
+    { 
+      type: 'imageProcessing', 
+      label: 'Image Processor', 
+      description: 'Resize, crop, filter and convert images', 
+      icon: Image,
+      color: 'from-pink-500 to-rose-600',
+      handles: { source: true, target: true },
+      component: 'ImageProcessingNode'
+    },
+    { 
+      type: 'dataVisualization', 
+      label: 'Data Visualization', 
+      description: 'Generate bar, line, pie, scatter and heatmap charts', 
+      icon: BarChart3,
+      color: 'from-blue-500 to-indigo-600',
+      handles: { source: false, target: true },
+      component: 'DataVisualizationNode'
+    },
+    { 
+      type: 'timer', 
+      label: 'Timer & Scheduler', 
+      description: 'Add delays, intervals, and scheduled execution', 
+      icon: Timer,
+      color: 'from-yellow-500 to-orange-600',
+      handles: { source: true, target: true },
+      component: 'TimerNode'
+    },
+    { 
+      type: 'documentGenerator', 
+      label: 'Document Generator', 
+      description: 'Generate PDF and DOCX documents from templates', 
+      icon: FileText,
+      color: 'from-purple-500 to-violet-600',
+      handles: { source: false, target: true },
+      component: 'DocumentGeneratorNode'
+    }
   ]
 };
 
@@ -295,7 +291,7 @@ const colorPalette = [
 ];
 
 const Toolbar = () => {
-  const { addNode, nodes, edges, deleteNode, clearPipeline } = useStore();
+  const { addNode, nodes, edges, clearPipeline } = useStore();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [expandedCategories, setExpandedCategories] = useState(
@@ -341,9 +337,11 @@ const Toolbar = () => {
           y: 200 + (row * (nodeHeight + margin))
         };
         
+        const currentX = position.x;
+        const currentY = position.y;
         const hasCollision = nodes.some(existingNode => {
-          const dx = Math.abs(existingNode.position.x - position.x);
-          const dy = Math.abs(existingNode.position.y - position.y);
+          const dx = Math.abs(existingNode.position.x - currentX);
+          const dy = Math.abs(existingNode.position.y - currentY);
           return dx < (nodeWidth + 30) && dy < (nodeHeight + 30);
         });
         

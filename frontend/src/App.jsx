@@ -8,8 +8,6 @@ import ReactFlow, {
   addEdge,
   useReactFlow,
   MarkerType,
-  Handle,
-  Position
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
@@ -19,209 +17,14 @@ import SubmitButton from './components/ui/SubmitButton';
 import PipelineStatus from './components/ui/PipelineStatus';
 import useStore from './store/useStore';
 import DeleteToolbar from './components/ui/DeleteToolbar';
+import { nodeTypes } from './components/nodes/nodeTypes';
 // Import icons
 import {
-  Database,
-  BarChart3,
-  Cpu,
-  Filter,
-  Globe,
-  Shuffle,
-  HardDrive,
   Save,
   Plus,
   Activity,
   Zap
 } from 'lucide-react';
-
-// Enhanced node types with handles for connections
-const nodeTypes = {
-  input: ({ data, selected }) => (
-    <div className={`group px-6 py-4 shadow-lg rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 text-white border-2 min-w-[160px] transition-all duration-300 hover:shadow-2xl hover:scale-105 ${
-      selected ? 'border-white scale-110 shadow-2xl' : 'border-emerald-300'
-    }`}>
-      <div className="flex items-center space-x-3">
-        <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center group-hover:bg-white/30 transition-colors">
-          <Database className="w-6 h-6" />
-        </div>
-        <div>
-          <div className="text-lg font-bold">Input</div>
-          <div className="text-xs text-emerald-100 mt-1 line-clamp-1">{data.label}</div>
-        </div>
-      </div>
-      <div className="mt-2 text-xs text-emerald-100 opacity-80">
-        {data.description}
-      </div>
-      {/* Only output handle for input nodes */}
-      <Handle
-        type="source"
-        position={Position.Right}
-        className="w-4 h-4 bg-white border-2 border-emerald-400"
-      />
-    </div>
-  ),
-
-  output: ({ data, selected }) => (
-    <div className={`group px-6 py-4 shadow-lg rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white border-2 min-w-[160px] transition-all duration-300 hover:shadow-2xl hover:scale-105 ${
-      selected ? 'border-white scale-110 shadow-2xl' : 'border-blue-400'
-    }`}>
-      <div className="flex items-center space-x-3">
-        <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center group-hover:bg-white/30 transition-colors">
-          <BarChart3 className="w-6 h-6" />
-        </div>
-        <div>
-          <div className="text-lg font-bold">Output</div>
-          <div className="text-xs text-blue-100 mt-1 line-clamp-1">{data.label}</div>
-        </div>
-      </div>
-      <div className="mt-2 text-xs text-blue-100 opacity-80">
-        {data.description}
-      </div>
-      {/* Only input handle for output nodes */}
-      <Handle
-        type="target"
-        position={Position.Left}
-        className="w-4 h-4 bg-white border-2 border-blue-400"
-      />
-    </div>
-  ),
-
-  process: ({ data, selected }) => (
-    <div className={`group px-6 py-4 shadow-lg rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 text-white border-2 min-w-[160px] transition-all duration-300 hover:shadow-2xl hover:scale-105 ${
-      selected ? 'border-white scale-110 shadow-2xl' : 'border-purple-400'
-    }`}>
-      <div className="flex items-center space-x-3">
-        <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center group-hover:bg-white/30 transition-colors">
-          <Cpu className="w-6 h-6" />
-        </div>
-        <div>
-          <div className="text-lg font-bold">Process</div>
-          <div className="text-xs text-purple-100 mt-1 line-clamp-1">{data.label}</div>
-        </div>
-      </div>
-      <div className="mt-2 text-xs text-purple-100 opacity-80">
-        {data.description}
-      </div>
-      {/* Both input and output handles */}
-      <Handle
-        type="target"
-        position={Position.Left}
-        className="w-4 h-4 bg-white border-2 border-purple-400"
-      />
-      <Handle
-        type="source"
-        position={Position.Right}
-        className="w-4 h-4 bg-white border-2 border-purple-400"
-      />
-    </div>
-  ),
-
-  filter: ({ data, selected }) => (
-    <div className={`group px-6 py-4 shadow-lg rounded-xl bg-gradient-to-br from-orange-500 to-red-500 text-white border-2 min-w-[160px] transition-all duration-300 hover:shadow-2xl hover:scale-105 ${
-      selected ? 'border-white scale-110 shadow-2xl' : 'border-orange-400'
-    }`}>
-      <div className="flex items-center space-x-3">
-        <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center group-hover:bg-white/30 transition-colors">
-          <Filter className="w-6 h-6" />
-        </div>
-        <div>
-          <div className="text-lg font-bold">Filter</div>
-          <div className="text-xs text-orange-100 mt-1 line-clamp-1">{data.label}</div>
-        </div>
-      </div>
-      <div className="mt-2 text-xs text-orange-100 opacity-80">
-        {data.description}
-      </div>
-      <Handle
-        type="target"
-        position={Position.Left}
-        className="w-4 h-4 bg-white border-2 border-orange-400"
-      />
-      <Handle
-        type="source"
-        position={Position.Right}
-        className="w-4 h-4 bg-white border-2 border-orange-400"
-      />
-    </div>
-  ),
-
-  api: ({ data, selected }) => (
-    <div className={`group px-6 py-4 shadow-lg rounded-xl bg-gradient-to-br from-cyan-500 to-blue-500 text-white border-2 min-w-[160px] transition-all duration-300 hover:shadow-2xl hover:scale-105 ${
-      selected ? 'border-white scale-110 shadow-2xl' : 'border-cyan-400'
-    }`}>
-      <div className="flex items-center space-x-3">
-        <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center group-hover:bg-white/30 transition-colors">
-          <Globe className="w-6 h-6" />
-        </div>
-        <div>
-          <div className="text-lg font-bold">API</div>
-          <div className="text-xs text-cyan-100 mt-1 line-clamp-1">{data.label}</div>
-        </div>
-      </div>
-      <div className="mt-2 text-xs text-cyan-100 opacity-80">
-        {data.description}
-      </div>
-      <Handle
-        type="source"
-        position={Position.Right}
-        className="w-4 h-4 bg-white border-2 border-cyan-400"
-      />
-    </div>
-  ),
-
-  transform: ({ data, selected }) => (
-    <div className={`group px-6 py-4 shadow-lg rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white border-2 min-w-[160px] transition-all duration-300 hover:shadow-2xl hover:scale-105 ${
-      selected ? 'border-white scale-110 shadow-2xl' : 'border-indigo-400'
-    }`}>
-      <div className="flex items-center space-x-3">
-        <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center group-hover:bg-white/30 transition-colors">
-          <Shuffle className="w-6 h-6" />
-        </div>
-        <div>
-          <div className="text-lg font-bold">Transform</div>
-          <div className="text-xs text-indigo-100 mt-1 line-clamp-1">{data.label}</div>
-        </div>
-      </div>
-      <div className="mt-2 text-xs text-indigo-100 opacity-80">
-        {data.description}
-      </div>
-      <Handle
-        type="target"
-        position={Position.Left}
-        className="w-4 h-4 bg-white border-2 border-indigo-400"
-      />
-      <Handle
-        type="source"
-        position={Position.Right}
-        className="w-4 h-4 bg-white border-2 border-indigo-400"
-      />
-    </div>
-  ),
-
-  database: ({ data, selected }) => (
-    <div className={`group px-6 py-4 shadow-lg rounded-xl bg-gradient-to-br from-slate-500 to-gray-600 text-white border-2 min-w-[160px] transition-all duration-300 hover:shadow-2xl hover:scale-105 ${
-      selected ? 'border-white scale-110 shadow-2xl' : 'border-slate-400'
-    }`}>
-      <div className="flex items-center space-x-3">
-        <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center group-hover:bg-white/30 transition-colors">
-          <HardDrive className="w-6 h-6" />
-        </div>
-        <div>
-          <div className="text-lg font-bold">Database</div>
-          <div className="text-xs text-slate-100 mt-1 line-clamp-1">{data.label}</div>
-        </div>
-      </div>
-      <div className="mt-2 text-xs text-slate-100 opacity-80">
-        {data.description}
-      </div>
-      <Handle
-        type="source"
-        position={Position.Right}
-        className="w-4 h-4 bg-white border-2 border-slate-400"
-      />
-    </div>
-  )
-};
 
 // Enhanced connection styling
 const connectionLineStyle = {
@@ -317,12 +120,34 @@ const Flow = () => {
 
   const { screenToFlowPosition } = useReactFlow();
 
-  // Enhanced connection handler
+  // Enhanced connection handler with duplicate prevention
   const onConnect = useCallback(
     (params) => {
       console.log('Creating connection:', params);
+      
+      // Check for duplicate connections
+      const isDuplicate = edges.some(edge => 
+        edge.source === params.source && 
+        edge.target === params.target &&
+        edge.sourceHandle === params.sourceHandle &&
+        edge.targetHandle === params.targetHandle
+      );
+
+      if (isDuplicate) {
+        console.warn('Duplicate connection prevented');
+        alert('⚠️ This connection already exists!');
+        return;
+      }
+
+      // Check for self-loop
+      if (params.source === params.target) {
+        console.warn('Self-loop prevented');
+        alert('⚠️ Cannot connect a node to itself!');
+        return;
+      }
+
       const newEdge = {
-        id: `e${params.source}-${params.target}`,
+        id: `e${params.source}-${params.sourceHandle || 'out'}-${params.target}-${params.targetHandle || 'in'}`,
         ...params,
         animated: true,
         style: {
@@ -337,7 +162,7 @@ const Flow = () => {
       };
       setEdges((eds) => addEdge(newEdge, eds));
     },
-    [setEdges]
+    [setEdges, edges]
   );
 
   // Enhanced drag handlers
@@ -495,130 +320,59 @@ const Flow = () => {
                 
                 <button
                   onClick={handleSavePipeline}
-                  className="p-3 rounded-xl bg-indigo-100 hover:bg-indigo-200 transition-all duration-300 group hover:scale-110"
-                  title="Save pipeline"
+                  className="flex items-center space-x-2 px-5 py-2.5 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-semibold hover:from-green-600 hover:to-emerald-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
                 >
-                  <Save className="w-5 h-5 text-indigo-600 group-hover:scale-110 transition-transform" />
+                  <Save className="w-5 h-5" />
+                  <span>Save</span>
                 </button>
               </div>
             </div>
           </Panel>
 
-          {/* Welcome Panel - Enhanced */}
-          {nodes.length === 0 && (
-            <Panel position="center" className="pointer-events-none">
-              {/* <div className="text-center p-16 bg-white/90 backdrop-blur-xl rounded-3xl border border-gray-200/60 shadow-2xl max-w-2xl">
-                <div className="text-8xl mb-8 animate-bounce">🚀</div>
-                <h2 className="text-4xl font-bold text-gray-800 mb-6">
-                  Welcome to Pipeline Builder
-                </h2>
-                <p className="text-gray-600 text-lg leading-relaxed mb-8 max-w-lg mx-auto">
-                  Create powerful data pipelines by adding nodes from the palette and connecting them together. 
-                  Build, analyze, and optimize your data workflows with ease.
-                </p>
-                
-                <div className="grid grid-cols-3 gap-8 max-w-md mx-auto">
-                  <div className="flex flex-col items-center">
-                    <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-green-500 rounded-full flex items-center justify-center mb-4 shadow-lg">
-                      <Plus className="w-8 h-8 text-white" />
-                    </div>
-                    <span className="font-semibold text-gray-700">Add Nodes</span>
-                    <span className="text-xs text-gray-500 mt-1">Click or drag</span>
-                  </div>
-                  <div className="flex flex-col items-center">
-                    <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-500 rounded-full flex items-center justify-center mb-4 shadow-lg">
-                      <Activity className="w-8 h-8 text-white" />
-                    </div>
-                    <span className="font-semibold text-gray-700">Connect</span>
-                    <span className="text-xs text-gray-500 mt-1">Create flow</span>
-                  </div>
-                  <div className="flex flex-col items-center">
-                    <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-purple-500 rounded-full flex items-center justify-center mb-4 shadow-lg">
-                      <Zap className="w-8 h-8 text-white" />
-                    </div>
-                    <span className="font-semibold text-gray-700">Analyze</span>
-                    <span className="text-xs text-gray-500 mt-1">Get insights</span>
-                  </div>
-                </div>
-              </div> */}
-            </Panel>
-          )}
+          {/* Sidebar Panels */}
+          <Panel position="top-left">
+            <Toolbar />
+          </Panel>
+
+          <Panel position="bottom-left">
+            <DeleteToolbar 
+              nodes={nodes}
+              edges={edges}
+              onDeleteSelected={deleteSelected}
+              onDeleteAll={deleteAll}
+              onUndoDelete={undoDelete}
+              onSelectAll={selectAll}
+              onClearSelection={clearSelection}
+              deletedHistory={deletedHistory}
+            />
+          </Panel>
+
+          <Panel position="bottom-center">
+            <SubmitButton />
+          </Panel>
+
+          <Panel position="top-right">
+            <PipelineStatus />
+          </Panel>
         </ReactFlow>
       </div>
-
-      {/* Floating UI Components */}
-      <div className="fixed top-6 left-6 z-30 pointer-events-auto">
-        <PipelineStatus />
-      </div>
-      
-      <div className="fixed top-6 right-6 z-40 pointer-events-auto">
-        <Toolbar />
-      </div>
-      
-      <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 pointer-events-auto">
-        <SubmitButton />
-      </div>
-<div className="fixed bottom-6 right-6 z-40 pointer-events-auto">
-  <DeleteToolbar
-    nodes={nodes}
-    edges={edges}
-    onDeleteSelected={deleteSelected}
-    onDeleteAll={deleteAll}
-    onUndoDelete={undoDelete}
-    onSelectAll={selectAll}
-    onClearSelection={clearSelection}
-    deletedHistory={deletedHistory}
-  />
-</div>
-      {/* Progress Indicator - Enhanced */}
-      {nodes.length > 0 && (
-        <div className="fixed top-24 left-1/2 transform -translate-x-1/2 z-20 pointer-events-none">
-          <div className="bg-white/90 backdrop-blur-lg px-8 py-4 rounded-2xl border border-gray-200/60 shadow-xl flex items-center space-x-6">
-            <div className="flex items-center space-x-3">
-              <div className="w-4 h-4 bg-blue-500 rounded-full animate-pulse"></div>
-              <span className="text-sm font-semibold text-gray-700">{nodes.length} nodes active</span>
-            </div>
-            <div className="w-px h-6 bg-gray-300"></div>
-            <div className="flex items-center space-x-3">
-              <div className="w-4 h-4 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-sm font-semibold text-gray-700">{edges.length} connections</span>
-            </div>
-            {nodes.length > 1 && edges.length > 0 && (
-              <>
-                <div className="w-px h-6 bg-gray-300"></div>
-                <div className="flex items-center space-x-3">
-                  <div className="w-4 h-4 bg-purple-500 rounded-full animate-pulse"></div>
-                  <span className="text-sm font-semibold text-purple-700">Ready to analyze</span>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 };
 
 // Main App Component
-function App() {
-  const [showWorkingArea, setShowWorkingArea] = useState(false);
+const App = () => {
+  const [showWelcome, setShowWelcome] = useState(true);
 
-  const handleGetStarted = () => {
-    setShowWorkingArea(true);
-  };
-
-  if (!showWorkingArea) {
-    return <WelcomeScreen onGetStarted={handleGetStarted} />;
+  if (showWelcome) {
+    return <WelcomeScreen onGetStarted={() => setShowWelcome(false)} />;
   }
 
   return (
-    <div className="w-full h-full overflow-hidden">
-      <ReactFlowProvider>
-        <Flow />
-      </ReactFlowProvider>
-    </div>
+    <ReactFlowProvider>
+      <Flow />
+    </ReactFlowProvider>
   );
-}
-
+};
 
 export default App;

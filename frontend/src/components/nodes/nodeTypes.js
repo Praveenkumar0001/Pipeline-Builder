@@ -20,14 +20,26 @@ import {
   TimerNode,
   DocumentGeneratorNode
 } from './NewNodeTypes';
+import BaseNodeNode from './BaseNodeNode';
+import {
+  CloudNode,
+  StreamNode,
+  StatisticsNode,
+  ImageNode,
+  NotificationNode,
+  VisualizationNode,
+  ProcessNode
+} from './ExtraNodes';
 
 // Node type registry for ReactFlow
 export const nodeTypes = {
+  basenode: BaseNodeNode,
   input: InputNode,
   output: OutputNode,
   text: TextNode,
   llm: LLMNode,
   api: APINode,
+  process: ProcessNode,
   filter: FilterNode,
   transform: TransformNode,
   math: MathNode,
@@ -36,6 +48,12 @@ export const nodeTypes = {
   join: JoinNode,
   aggregate: AggregateNode,
   custom: CustomNode,
+  cloud: CloudNode,
+  stream: StreamNode,
+  statistics: StatisticsNode,
+  image: ImageNode,
+  notification: NotificationNode,
+  visualization: VisualizationNode,
   email: EmailNode,
   imageProcessing: ImageProcessingNode,
   dataVisualization: DataVisualizationNode,

@@ -11,6 +11,8 @@ const APINode = ({ id, data, selected }) => {
   const [body, setBody] = useState(data.body || '');
   const [authentication, setAuthentication] = useState(data.authentication || 'none');
   const [apiKey, setApiKey] = useState(data.apiKey || '');
+  const [testResponse, setTestResponse] = useState(data.testResponse || null);
+  const [isTesting, setIsTesting] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const updateNodeData = useStore(state => state.updateNodeData);
 
@@ -48,6 +50,82 @@ const APINode = ({ id, data, selected }) => {
     const newKey = e.target.value;
     setApiKey(newKey);
     updateNodeData(id, { apiKey: newKey });
+  };
+
+  const handleTestAPI = async () => {
+    if (!url.trim()) {
+      alert('Please enter a URL');
+      return;
+    }
+
+    setIsTesting(true);
+    
+    try {
+      const requestOptions = {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      };
+
+      // Add headers if provided
+      if (headers.trim()) {
+        try {
+          const parsedHeaders = JSON.parse(headers);
+          requestOptions.headers = { ...requestOptions.headers, ...parsedHeaders };
+        } catch (e) {
+          console.warn('Invalid headers JSON, using defaults');
+        }
+      }
+
+      // Add authentication
+      if (authentication === 'api-key' && apiKey) {
+        requestOptions.headers['X-API-Key'] = apiKey;
+      } else if (authentication === 'bearer' && apiKey) {
+        requestOptions.headers['Authorization'] = `Bearer ${apiKey}`;
+      }
+
+      // Add body for POST/PUT/PATCH
+      if (['POST', 'PUT', 'PATCH'].includes(method) && body.trim()) {
+        requestOptions.body = body;
+      }
+
+      const response = await fetch(url, requestOptions);
+      const responseData = await response.json().catch(() => response.text());
+
+      const result = {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok,
+        data: responseData,
+        timestamp: new Date().toISOString(),
+        method: method,
+        url: url
+      };
+
+      setTestResponse(result);
+      updateNodeData(id, { 
+        testResponse: result,
+        lastTest: new Date().toISOString()
+      });
+
+    } catch (error) {
+      const errorResult = {
+        status: 0,
+        statusText: 'Error',
+        ok: false,
+        error: error.message,
+        timestamp: new Date().toISOString(),
+        method: method,
+        url: url
+      };
+      
+      setTestResponse(errorResult);
+      updateNodeData(id, { testResponse: errorResult });
+      alert('API Test failed: ' + error.message);
+    } finally {
+      setIsTesting(false);
+    }
   };
 
   const methods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'];
@@ -211,6 +289,51 @@ const APINode = ({ id, data, selected }) => {
             )}
           </div>
         )}
+
+        {/* Test API Button */}
+        <div className="pt-3 border-t border-gray-100">
+          <button
+            onClick={handleTestAPI}
+            disabled={isTesting || !url.trim()}
+            className={`
+              w-full flex items-center justify-center space-x-2 py-2 px-4 rounded-lg font-semibold text-sm
+              transition-all duration-200 transform
+              ${isTesting || !url.trim()
+                ? 'bg-gray-300 text-gray-600 cursor-not-allowed' 
+                : 'bg-indigo-500 text-white hover:bg-indigo-600 hover:scale-105 active:scale-95'
+              }
+            `}
+          >
+            <Send className={`w-4 h-4 ${isTesting ? 'animate-pulse' : ''}`} />
+            <span>{isTesting ? 'Testing...' : 'Test API Call'}</span>
+          </button>
+
+          {/* Test Response Display */}
+          {testResponse && (
+            <div className={`mt-3 border rounded-lg p-3 ${
+              testResponse.ok ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
+            }`}>
+              <div className={`text-xs font-semibold mb-2 flex items-center justify-between ${
+                testResponse.ok ? 'text-green-800' : 'text-red-800'
+              }`}>
+                <span>Response</span>
+                <span className={testResponse.ok ? 'text-green-600' : 'text-red-600'}>
+                  {testResponse.status} {testResponse.statusText}
+                </span>
+              </div>
+              <div className={`text-xs whitespace-pre-wrap font-mono bg-white p-2 rounded border max-h-32 overflow-y-auto ${
+                testResponse.ok ? 'border-green-100 text-green-900' : 'border-red-100 text-red-900'
+              }`}>
+                {testResponse.error || JSON.stringify(testResponse.data, null, 2)}
+              </div>
+              <div className={`text-xs mt-2 text-right ${
+                testResponse.ok ? 'text-green-600' : 'text-red-600'
+              }`}>
+                {new Date(testResponse.timestamp).toLocaleTimeString()}
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* Configuration Summary */}
         <div className="pt-3 border-t border-gray-100">

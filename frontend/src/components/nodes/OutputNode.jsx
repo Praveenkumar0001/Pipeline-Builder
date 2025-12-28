@@ -9,7 +9,11 @@ const OutputNode = ({ id, data, selected }) => {
   const [format, setFormat] = useState(data?.format || 'json');
   const [description, setDescription] = useState(data?.description || '');
   const [destination, setDestination] = useState(data?.destination || '');
+  const [previewData, setPreviewData] = useState(data?.previewData || null);
+  const [isExporting, setIsExporting] = useState(false);
   const updateNodeData = useStore(state => state.updateNodeData);
+  const nodes = useStore(state => state.nodes);
+  const edges = useStore(state => state.edges);
 
   const handleOutputTypeChange = (type) => {
     setOutputType(type);
@@ -38,6 +42,87 @@ const OutputNode = ({ id, data, selected }) => {
     const dest = e.target.value;
     setDestination(dest);
     updateNodeData(id, { destination: dest });
+  };
+
+  const handleExport = () => {
+    setIsExporting(true);
+    
+    try {
+      // Collect data from connected input nodes
+      const connectedEdges = edges.filter(edge => edge.target === id);
+      const sourceNodes = connectedEdges.map(edge => 
+        nodes.find(node => node.id === edge.source)
+      ).filter(Boolean);
+
+      // Gather data from source nodes
+      const collectedData = {
+        timestamp: new Date().toISOString(),
+        outputName: outputName,
+        format: format,
+        sources: sourceNodes.map(node => ({
+          id: node.id,
+          type: node.type,
+          data: node.data
+        })),
+        nodeCount: sourceNodes.length
+      };
+
+      // Create downloadable file
+      let content, mimeType, extension;
+      
+      switch (format) {
+        case 'json':
+          content = JSON.stringify(collectedData, null, 2);
+          mimeType = 'application/json';
+          extension = 'json';
+          break;
+        case 'csv':
+          // Simple CSV conversion
+          const headers = Object.keys(collectedData);
+          const values = Object.values(collectedData).map(v => 
+            typeof v === 'object' ? JSON.stringify(v) : v
+          );
+          content = headers.join(',') + '\n' + values.join(',');
+          mimeType = 'text/csv';
+          extension = 'csv';
+          break;
+        case 'txt':
+          content = `Output: ${outputName}\nTimestamp: ${collectedData.timestamp}\nSources: ${collectedData.nodeCount}\n\nData:\n${JSON.stringify(collectedData, null, 2)}`;
+          mimeType = 'text/plain';
+          extension = 'txt';
+          break;
+        default:
+          content = JSON.stringify(collectedData, null, 2);
+          mimeType = 'application/json';
+          extension = 'json';
+      }
+
+      // Download file
+      const blob = new Blob([content], { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${outputName || 'output'}_${Date.now()}.${extension}`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      // Store preview
+      setPreviewData(collectedData);
+      updateNodeData(id, { 
+        previewData: collectedData,
+        lastExport: new Date().toISOString(),
+        exportCount: (data?.exportCount || 0) + 1
+      });
+
+      alert(`✅ Successfully exported to ${outputName}.${extension}`);
+    } catch (error) {
+      console.error('Export error:', error);
+      alert('❌ Export failed: ' + error.message);
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   const getIcon = () => {
@@ -181,10 +266,15 @@ const OutputNode = ({ id, data, selected }) => {
 
         {/* Configuration Preview */}
         <div className="pt-3 border-t border-gray-100">
-          <div className="bg-orange-50 rounded-lg p-3">
-            <div className="flex items-center space-x-2 mb-2">
-              <Download className="w-4 h-4 text-orange-600" />
-              <span className="text-xs font-semibold text-orange-800">Output Configuration</span>
+          <div className="bg-orange-50 rounded-lg p-3 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Download className="w-4 h-4 text-orange-600" />
+                <span className="text-xs font-semibold text-orange-800">Output Configuration</span>
+              </div>
+              {data?.exportCount > 0 && (
+                <span className="text-xs text-orange-600 font-medium">{data.exportCount} exports</span>
+              )}
             </div>
             <div className="text-xs text-orange-700 space-y-1">
               <div className="flex items-center justify-between">
@@ -200,6 +290,29 @@ const OutputNode = ({ id, data, selected }) => {
                 <span className="font-medium">{outputName || 'Unnamed'}</span>
               </div>
             </div>
+            
+            {/* Export Button */}
+            <button
+              onClick={handleExport}
+              disabled={isExporting}
+              className={`
+                w-full flex items-center justify-center space-x-2 py-2 px-4 rounded-lg font-semibold text-sm
+                transition-all duration-200 transform
+                ${isExporting 
+                  ? 'bg-gray-300 text-gray-600 cursor-wait' 
+                  : 'bg-orange-500 text-white hover:bg-orange-600 hover:scale-105 active:scale-95'
+                }
+              `}
+            >
+              <Download className={`w-4 h-4 ${isExporting ? 'animate-bounce' : ''}`} />
+              <span>{isExporting ? 'Exporting...' : 'Export Data'}</span>
+            </button>
+            
+            {data?.lastExport && (
+              <div className="text-xs text-orange-600 text-center pt-2 border-t border-orange-200">
+                Last export: {new Date(data.lastExport).toLocaleTimeString()}
+              </div>
+            )}
           </div>
         </div>
       </div>

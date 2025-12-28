@@ -1,7 +1,7 @@
 
 import React, { memo, useState } from 'react';
 import { Handle, Position } from 'reactflow';
-import { Settings, Maximize2, Minimize2 } from 'lucide-react';
+import { Maximize2, Minimize2 } from 'lucide-react';
 
 const BaseNode = memo(({ 
   id,

@@ -1,6 +1,5 @@
 import React, { useState, useCallback } from 'react';
 import { 
-  Play, 
   Loader2, 
   CheckCircle, 
   XCircle, 
@@ -14,12 +13,11 @@ import {
   Upload,
   Zap,
   TrendingUp,
-  Clock,
   HardDrive,
-  Trash2,
-  Maximize2
+  Trash2
 } from 'lucide-react';
 import useStore from '../../store/useStore';
+import submitPipeline from '../../submit';
 
 // Pipeline Result Modal Component
 const PipelineResultModal = ({ result, onClose }) => {
@@ -258,15 +256,13 @@ const SubmitButton = () => {
   const { 
     nodes, 
     edges, 
-    isLoading, 
-    analyzePipeline,
+    isLoading,
     exportPipeline, 
     importPipeline,
     clearPipeline,
     error,
     pipelineResult,
     setError,
-    setLoading,
     setPipelineResult
   } = useStore();
   
@@ -313,7 +309,7 @@ const SubmitButton = () => {
 
   const stats = calculateStats();
 
-  // Handle pipeline analysis with better error handling
+  // Handle pipeline analysis - uses submit.js as specified in assignment
   const handleAnalyze = async () => {
     if (!nodes || nodes.length === 0) {
       setError('Please add some nodes to the pipeline before analyzing.');
@@ -322,45 +318,40 @@ const SubmitButton = () => {
 
     try {
       setError(null);
-      setLoading(true);
       
-      // Simulate realistic analysis with progress
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Use the submitPipeline function from submit.js
+      const result = await submitPipeline();
       
-      // Create comprehensive analysis result
-      const result = {
-        timestamp: new Date().toISOString(),
-        num_nodes: nodes.length,
-        num_edges: edges.length,
-        is_dag: !hasCycles(nodes, edges),
-        has_input: stats.hasInput,
-        has_output: stats.hasOutput,
-        complexity: getComplexityLevel(nodes.length, edges.length),
-        score: calculatePipelineScore(stats),
-        message: getAnalysisMessage(stats),
-        node_types: [...new Set(nodes.map(n => n.type))],
-        issues: stats.issues,
-        recommendations: getRecommendations(stats),
-        performance: {
-          estimated_runtime: `${(nodes.length * 0.3 + edges.length * 0.1).toFixed(1)}s`,
-          memory_usage: `${(nodes.length * 45 + edges.length * 20)}MB`,
-          optimization_score: Math.min(100, (edges.length / Math.max(1, nodes.length - 1)) * 100)
-        }
-      };
-
-      setPipelineResult(result);
-      setShowResult(true);
-      
-      // Auto-hide after 30 seconds
-      setTimeout(() => {
-        setShowResult(false);
-      }, 30000);
-
+      if (result) {
+        // Enhance result with local analytics
+        const enhancedResult = {
+          ...result,
+          timestamp: new Date().toISOString(),
+          has_input: stats.hasInput,
+          has_output: stats.hasOutput,
+          complexity: getComplexityLevel(result.num_nodes, result.num_edges),
+          score: calculatePipelineScore(stats),
+          node_types: [...new Set(nodes.map(n => n.type))],
+          issues: stats.issues,
+          recommendations: getRecommendations(stats),
+          performance: {
+            estimated_runtime: `${(result.num_nodes * 0.3 + result.num_edges * 0.1).toFixed(1)}s`,
+            memory_usage: `${(result.num_nodes * 45 + result.num_edges * 20)}MB`,
+            optimization_score: Math.min(100, (result.num_edges / Math.max(1, result.num_nodes - 1)) * 100)
+          }
+        };
+        
+        setPipelineResult(enhancedResult);
+        setShowResult(true);
+        
+        // Auto-hide modal after 30 seconds
+        setTimeout(() => {
+          setShowResult(false);
+        }, 30000);
+      }
     } catch (error) {
       console.error('Analysis error:', error);
       setError(`Analysis failed: ${error.message}`);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -939,48 +930,6 @@ const StatusIndicator = ({ label, status, description }) => (
 );
 
 // Helper functions
-function hasCycles(nodes, edges) {
-  if (!edges || edges.length === 0) return false;
-  
-  const adjacencyList = {};
-  nodes.forEach(node => {
-    adjacencyList[node.id] = [];
-  });
-  
-  edges.forEach(edge => {
-    if (adjacencyList[edge.source]) {
-      adjacencyList[edge.source].push(edge.target);
-    }
-  });
-  
-  const visited = new Set();
-  const recursionStack = new Set();
-  
-  function dfs(nodeId) {
-    if (recursionStack.has(nodeId)) return true;
-    if (visited.has(nodeId)) return false;
-    
-    visited.add(nodeId);
-    recursionStack.add(nodeId);
-    
-    const neighbors = adjacencyList[nodeId] || [];
-    for (const neighbor of neighbors) {
-      if (dfs(neighbor)) return true;
-    }
-    
-    recursionStack.delete(nodeId);
-    return false;
-  }
-  
-  for (const nodeId of Object.keys(adjacencyList)) {
-    if (!visited.has(nodeId)) {
-      if (dfs(nodeId)) return true;
-    }
-  }
-  
-  return false;
-}
-
 function getComplexityLevel(nodeCount, edgeCount) {
   if (nodeCount === 0) return 'Empty';
   if (nodeCount <= 3 && edgeCount <= 3) return 'Simple';
@@ -999,20 +948,6 @@ function calculatePipelineScore(stats) {
   if (stats.totalNodes >= 2 && stats.isConnected) score += 10;
   
   return Math.min(score, 100);
-}
-
-function getAnalysisMessage(stats) {
-  if (stats.isValid) {
-    return 'Your pipeline is well-structured and ready for execution.';
-  } else if (stats.totalNodes === 0) {
-    return 'Pipeline is empty. Add some nodes to get started.';
-  } else if (!stats.hasInput || !stats.hasOutput) {
-    return 'Pipeline needs both input and output nodes to function properly.';
-  } else if (!stats.isConnected) {
-    return 'Nodes exist but are not connected. Link them to create data flow.';
-  } else {
-    return 'Pipeline has some issues that need to be addressed.';
-  }
 }
 
 function getRecommendations(stats) {
