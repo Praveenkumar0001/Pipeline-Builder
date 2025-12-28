@@ -23,36 +23,42 @@ const BaseNode = memo(({
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const handleStyle = {
-    width: '12px',
-    height: '12px',
-    border: '2px solid #ffffff',
+    width: '14px',
+    height: '14px',
+    border: '3px solid #ffffff',
     borderRadius: '50%',
-    background: '#3b82f6',
-    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+    background: '#818cf8',
+    boxShadow: '0 4px 12px rgba(129, 140, 248, 0.3), 0 0 0 2px rgba(255, 255, 255, 0.8)',
+    transition: 'all 0.3s ease'
   };
 
   const inputHandleStyle = {
     ...handleStyle,
-    background: '#ef4444'
+    background: '#f87171',
+    boxShadow: '0 4px 12px rgba(248, 113, 113, 0.3), 0 0 0 2px rgba(255, 255, 255, 0.8)'
   };
 
   const outputHandleStyle = {
     ...handleStyle,
-    background: '#10b981'
+    background: '#818cf8',
+    boxShadow: '0 4px 12px rgba(129, 140, 248, 0.3), 0 0 0 2px rgba(255, 255, 255, 0.8)'
   };
 
   return (
     <div 
       className={`
-        bg-white rounded-xl shadow-lg border-2 transition-all duration-200
-        ${selected ? 'ring-2 ring-blue-400 ring-opacity-75 shadow-xl' : 'hover:shadow-xl'}
+        bg-white rounded-2xl shadow-xl border-2 transition-all duration-300
+        ${selected ? 'ring-4 ring-indigo-300 shadow-2xl scale-105' : 'hover:shadow-2xl hover:scale-102'}
         ${borderColor}
         ${className}
       `}
       style={{
         minWidth: `${minWidth}px`,
         maxWidth: `${maxWidth}px`,
-        transform: selected ? 'scale(1.02)' : 'scale(1)'
+        transform: selected ? 'scale(1.05)' : 'scale(1)',
+        boxShadow: selected 
+          ? '0 20px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 4px rgba(99, 102, 241, 0.2)'
+          : '0 10px 30px -5px rgba(0, 0, 0, 0.1)'
       }}
     >
       {/* Input Handles */}
@@ -73,7 +79,7 @@ const BaseNode = memo(({
 
       {/* Header */}
       <div className={`
-        flex items-center justify-between p-3 rounded-t-xl
+        flex items-center justify-between p-4 rounded-t-2xl transition-all duration-300
         ${headerColor} ${headerTextColor}
       `}>
         <div className="flex items-center space-x-2">
@@ -99,7 +105,7 @@ const BaseNode = memo(({
 
       {/* Content */}
       {!isCollapsed && (
-        <div className="p-4">
+        <div className="p-5">
           {children}
         </div>
       )}

@@ -29,19 +29,19 @@ import {
 // Enhanced connection styling
 const connectionLineStyle = {
   strokeWidth: 3,
-  stroke: '#6366f1',
+  stroke: '#818cf8',
   strokeDasharray: '8,4',
 };
 
 const defaultEdgeOptions = {
   style: { 
     strokeWidth: 3, 
-    stroke: '#6366f1',
+    stroke: '#818cf8',
   },
   type: 'smoothstep',
   markerEnd: {
     type: MarkerType.ArrowClosed,
-    color: '#6366f1',
+    color: '#818cf8',
     width: 25,
     height: 25
   },
@@ -50,10 +50,10 @@ const defaultEdgeOptions = {
 
 // Welcome Screen Component
 const WelcomeScreen = ({ onGetStarted }) => (
-  <div className="h-screen w-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
-    <div className="text-center p-16 bg-white/90 backdrop-blur-xl rounded-3xl border border-gray-200/60 shadow-2xl max-w-2xl">
+  <div className="h-screen w-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 flex items-center justify-center">
+    <div className="text-center p-16 bg-white rounded-3xl border-2 border-gray-200 shadow-2xl max-w-2xl">
       <div className="text-8xl mb-8 animate-bounce">🚀</div>
-      <h1 className="text-5xl font-bold text-gray-800 mb-6">
+      <h1 className="text-5xl font-bold text-gray-900 mb-6">
        Welcome to Pipeline Builder
       </h1>
       <p className="text-gray-600 text-lg leading-relaxed mb-12 max-w-lg mx-auto">
@@ -63,7 +63,7 @@ const WelcomeScreen = ({ onGetStarted }) => (
       
       <button
         onClick={onGetStarted}
-        className="group bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-12 py-4 rounded-2xl text-xl font-semibold hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+        className="group bg-indigo-500 text-white px-12 py-4 rounded-2xl text-xl font-semibold hover:bg-indigo-600 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
       >
         <div className="flex items-center space-x-3">
           <span>Get Started</span>
@@ -73,21 +73,21 @@ const WelcomeScreen = ({ onGetStarted }) => (
       
       <div className="grid grid-cols-3 gap-8 max-w-md mx-auto mt-12">
         <div className="flex flex-col items-center">
-          <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-green-500 rounded-full flex items-center justify-center mb-4 shadow-lg">
+          <div className="w-16 h-16 bg-indigo-400 rounded-full flex items-center justify-center mb-4 shadow-lg">
             <Plus className="w-8 h-8 text-white" />
           </div>
           <span className="font-semibold text-gray-700">Add Nodes</span>
           <span className="text-xs text-gray-500 mt-1">Click or drag</span>
         </div>
         <div className="flex flex-col items-center">
-          <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-500 rounded-full flex items-center justify-center mb-4 shadow-lg">
+          <div className="w-16 h-16 bg-gray-400 rounded-full flex items-center justify-center mb-4 shadow-lg">
             <Activity className="w-8 h-8 text-white" />
           </div>
           <span className="font-semibold text-gray-700">Connect</span>
           <span className="text-xs text-gray-500 mt-1">Create flow</span>
         </div>
         <div className="flex flex-col items-center">
-          <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-purple-500 rounded-full flex items-center justify-center mb-4 shadow-lg">
+          <div className="w-16 h-16 bg-indigo-400 rounded-full flex items-center justify-center mb-4 shadow-lg">
             <Zap className="w-8 h-8 text-white" />
           </div>
           <span className="font-semibold text-gray-700">Analyze</span>
@@ -219,7 +219,7 @@ const Flow = () => {
   }, [exportPipeline]);
 
   return (
-    <div className="h-screen w-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 overflow-hidden relative">
+    <div className="h-screen w-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 overflow-hidden relative">
       {/* Main Canvas */}
       <div
         ref={reactFlowWrapper}
@@ -260,12 +260,12 @@ const Flow = () => {
         >
           {/* Enhanced Background */}
           <Background 
-            color="#cbd5e1" 
-            gap={25} 
-            size={1.5}
+            color="#9ca3af" 
+            gap={30} 
+            size={2}
             style={{ 
-              opacity: 0.5,
-              background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 30%, #e0f2fe 60%, #ddd6fe 100%)',
+              opacity: 0.3,
+              background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%)',
             }}
             variant="dots"
           />
@@ -274,13 +274,14 @@ const Flow = () => {
           <Controls 
             position="bottom-right"
             style={{
-              background: 'rgba(255, 255, 255, 0.95)',
-              borderRadius: '16px',
-              border: '2px solid rgba(99, 102, 241, 0.1)',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-              marginRight: '24px',
-              marginBottom: '24px',
-              backdropFilter: 'blur(16px)'
+              background: 'rgba(255, 255, 255, 0.98)',
+              borderRadius: '24px',
+              border: '2px solid rgba(99, 102, 241, 0.2)',
+              boxShadow: '0 20px 60px rgba(99, 102, 241, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.5) inset',
+              marginRight: '28px',
+              marginBottom: '28px',
+              backdropFilter: 'blur(20px)',
+              padding: '8px'
             }}
             showZoom={true}
             showFitView={true}
@@ -289,30 +290,32 @@ const Flow = () => {
 
           {/* Header Panel */}
           <Panel position="top-center">
-            <div className="bg-white/95 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl px-8 py-5">
+            <div className="bg-white/98 backdrop-blur-2xl border-2 border-gray-200 rounded-3xl shadow-2xl px-10 py-6">
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-5">
-                  <div className="flex items-center space-x-4">
-                    <div className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-                      <span className="text-white text-2xl">🚀</span>
+                <div className="flex items-center space-x-6">
+                  <div className="flex items-center space-x-5">
+                    <div className="w-14 h-14 bg-indigo-500 rounded-2xl flex items-center justify-center shadow-lg ring-4 ring-indigo-50 transform hover:scale-110 transition-transform duration-300">
+                      <span className="text-white text-3xl">🚀</span>
                     </div>
                     <div>
-                      <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                      <h1 className="text-3xl font-extrabold text-gray-700">
                         Pipeline Builder
                       </h1>
-                      <p className="text-sm text-gray-600">Visual data pipeline creator & analyzer</p>
+                      <p className="text-sm text-gray-400 font-medium mt-0.5">Visual data pipeline creator & analyzer</p>
                     </div>
                   </div>
                   
                   {(nodes.length > 0 || edges.length > 0) && (
-                    <div className="flex items-center space-x-6 ml-8 pl-6 border-l border-gray-200">
-                      <div className="flex items-center space-x-2">
-                        <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
-                        <span className="text-sm font-semibold text-gray-700">{nodes.length} nodes</span>
+                    <div className="flex items-center space-x-8 ml-10 pl-8 border-l-2 border-gray-100">
+                      <div className="flex items-center space-x-3 px-4 py-2 bg-gray-50 rounded-xl border border-gray-100">
+                        <div className="w-2.5 h-2.5 bg-indigo-400 rounded-full animate-pulse shadow-md shadow-indigo-300/30"></div>
+                        <span className="text-sm font-bold text-gray-700">{nodes.length}</span>
+                        <span className="text-xs font-medium text-gray-500">nodes</span>
                       </div>
-                      <div className="flex items-center space-x-2">
-                        <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                        <span className="text-sm font-semibold text-gray-700">{edges.length} connections</span>
+                      <div className="flex items-center space-x-3 px-4 py-2 bg-gray-50 rounded-xl border border-gray-100">
+                        <div className="w-2.5 h-2.5 bg-indigo-400 rounded-full animate-pulse shadow-md shadow-indigo-300/30"></div>
+                        <span className="text-sm font-bold text-gray-700">{edges.length}</span>
+                        <span className="text-xs font-medium text-gray-500">connections</span>
                       </div>
                     </div>
                   )}
@@ -320,10 +323,10 @@ const Flow = () => {
                 
                 <button
                   onClick={handleSavePipeline}
-                  className="flex items-center space-x-2 px-5 py-2.5 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-semibold hover:from-green-600 hover:to-emerald-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+                  className="flex items-center space-x-3 px-6 py-3 bg-indigo-500 text-white rounded-2xl font-bold hover:bg-indigo-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 ring-2 ring-indigo-100"
                 >
                   <Save className="w-5 h-5" />
-                  <span>Save</span>
+                  <span>Save Pipeline</span>
                 </button>
               </div>
             </div>

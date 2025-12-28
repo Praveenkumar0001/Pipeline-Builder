@@ -786,47 +786,47 @@ const Toolbar = () => {
 
   // Main expanded view
   return (
-    <div className="w-96 max-h-[90vh] bg-white/95 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+    <div className="w-[380px] max-h-[88vh] bg-white/98 backdrop-blur-2xl border-2 border-indigo-100/50 rounded-3xl shadow-2xl overflow-hidden flex flex-col">
       {/* Enhanced Header */}
-      <div className="bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-5 relative overflow-hidden">
-        <div className="absolute inset-0 bg-white/10 bg-[radial-gradient(circle_at_30%_20%,_white_0%,_transparent_50%)]"></div>
+      <div className="bg-indigo-500 p-4 relative overflow-hidden">
+        <div className="absolute inset-0 bg-white/10"></div>
         <div className="relative z-10">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                <Settings className="w-6 h-6 text-white" />
+          <div className="flex items-center justify-between mb-3 gap-2">
+            <div className="flex items-center space-x-2.5 min-w-0 flex-1">
+              <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center shadow-lg flex-shrink-0">
+                <Settings className="w-5 h-5 text-white" />
               </div>
-              <div>
-                <h3 className="text-white font-bold text-xl">Node Palette</h3>
-                <p className="text-white/80 text-sm">Professional node creation toolkit</p>
+              <div className="min-w-0 flex-1">
+                <h3 className="text-white font-bold text-lg leading-tight">Node Palette</h3>
+                <p className="text-white/90 text-[10px] font-medium mt-0.5">Professional toolkit</p>
               </div>
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-1.5 flex-shrink-0">
               <button
                 onClick={() => setShowDeleteMode(!showDeleteMode)}
-                className={`p-2 rounded-lg transition-all ${
+                className={`p-1.5 rounded-lg transition-all ${
                   showDeleteMode 
                     ? 'bg-red-500 text-white' 
                     : 'text-white/80 hover:text-white hover:bg-white/20'
                 }`}
                 title="Toggle delete mode"
               >
-                <Trash2 className="w-5 h-5" />
+                <Trash2 className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setIsCollapsed(true)}
-                className="text-white/80 hover:text-white p-2 rounded-lg hover:bg-white/20 transition-all"
+                className="text-white/80 hover:text-white p-1.5 rounded-lg hover:bg-white/20 transition-all"
                 title="Collapse palette"
               >
-                <Minus className="w-6 h-6" />
+                <Minus className="w-5 h-5" />
               </button>
             </div>
           </div>
-          <div className="flex items-center justify-between text-sm">
-            <div className="text-white/90">
-              {nodes.length} active • {edges.length} connections • {totalAvailableNodes} available
+          <div className="flex items-center justify-between text-[10px] gap-2">
+            <div className="text-white/90 font-medium truncate">
+              {nodes.length} active • {edges.length} edges • {totalAvailableNodes} available
             </div>
-            <div className="text-white/70">v3.2 Pro</div>
+            <div className="text-white/70 font-bold flex-shrink-0">v3.2</div>
           </div>
         </div>
       </div>
@@ -857,32 +857,32 @@ const Toolbar = () => {
       )}
 
       {/* Create Manual Node Section */}
-      <div className="p-5 border-b border-gray-100 bg-gradient-to-r from-purple-50 to-indigo-50">
+      <div className="p-4 border-b-2 border-gray-100 bg-gray-50">
         <button
           onClick={() => setShowManualCreator(true)}
-          className="w-full p-4 bg-gradient-to-r from-purple-500 to-indigo-600 text-white rounded-xl hover:shadow-lg hover:scale-[1.02] transition-all duration-200 flex items-center justify-center space-x-3 font-semibold"
+          className="w-full p-3.5 bg-indigo-500 text-white rounded-xl hover:bg-indigo-600 hover:shadow-xl hover:scale-[1.02] transition-all duration-300 flex items-center justify-center space-x-2.5 font-bold shadow-md"
         >
           <Wand2 className="w-5 h-5" />
-          <span>Create Custom Node</span>
-          <div className="ml-2 px-2 py-1 bg-white/20 rounded-full text-xs font-bold">
-            New
+          <span className="text-sm">Create Custom Node</span>
+          <div className="px-2 py-0.5 bg-white/25 rounded-full text-[10px] font-extrabold shadow-sm">
+            NEW
           </div>
         </button>
-        <p className="text-center text-xs text-gray-600 mt-2">
-          Build custom nodes using BaseNode foundation
+        <p className="text-center text-[10px] text-gray-600 mt-2 font-medium">
+          🎨 Build using BaseNode foundation
         </p>
       </div>
 
       {/* Enhanced Search */}
-      <div className="p-5 border-b border-gray-100 bg-white">
-        <div className="relative mb-3">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+      <div className="p-4 border-b-2 border-gray-100 bg-white">
+        <div className="relative mb-2.5">
+          <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-indigo-400 w-4 h-4" />
           <input
             type="text"
-            placeholder="Search nodes by name, type, or category..."
+            placeholder="Search nodes..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-11 pr-11 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm bg-white shadow-sm"
+            className="w-full pl-10 pr-10 py-2.5 border-2 border-indigo-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 text-xs bg-white shadow-sm font-medium transition-all duration-300 hover:border-indigo-200"
           />
           {searchTerm && (
             <button
@@ -894,15 +894,15 @@ const Toolbar = () => {
             </button>
           )}
         </div>
-        <div className="flex items-center justify-between text-xs text-gray-600">
+        <div className="flex items-center justify-between text-[10px] text-gray-600">
           <span>
             {searchTerm ? (
-              <span className="font-medium">Found {totalAvailableNodes} nodes</span>
+              <span className="font-bold">Found {totalAvailableNodes}</span>
             ) : (
-              <span>{totalAvailableNodes} professional nodes ready</span>
+              <span className="font-medium">{totalAvailableNodes} nodes available</span>
             )}
           </span>
-          <span className="text-gray-400">Enhanced Search</span>
+          <span className="text-gray-400 font-medium">Enhanced</span>
         </div>
       </div>
 
@@ -930,13 +930,13 @@ const Toolbar = () => {
               {/* Enhanced Category Header */}
               <button
                 onClick={() => toggleCategory(category)}
-                className="w-full px-5 py-4 flex items-center justify-between text-left hover:bg-gray-50 transition-colors group"
+                className="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 transition-all duration-300 group"
               >
                 <div className="flex items-center space-x-3">
-                  <span className="text-lg font-bold text-gray-700 group-hover:text-gray-900 transition-colors">
+                  <span className="text-base font-extrabold text-gray-800 group-hover:text-indigo-600 transition-colors">
                     {category}
                   </span>
-                  <span className="text-xs text-gray-500 bg-gray-100 px-3 py-1 rounded-full font-semibold">
+                  <span className="text-[10px] text-indigo-600 bg-indigo-100 px-2 py-1 rounded-full font-bold shadow-sm">
                     {categoryNodes.length}
                   </span>
                 </div>
@@ -948,7 +948,7 @@ const Toolbar = () => {
               
               {/* Enhanced Category Nodes */}
               {expandedCategories.has(category) && (
-                <div className="pb-3">
+                <div className="pb-2">
                   {categoryNodes.map((node) => {
                     const IconComponent = node.icon;
                     return (
@@ -960,32 +960,32 @@ const Toolbar = () => {
                             event.dataTransfer.setData('application/reactflow', node.type);
                             event.dataTransfer.effectAllowed = 'move';
                           }}
-                          className={`w-full p-4 bg-gradient-to-r ${node.color} text-white rounded-xl hover:shadow-lg hover:scale-[1.02] transition-all duration-200 flex items-center space-x-4 group border border-white/20`}
+                          className={`w-full p-3 bg-gradient-to-r ${node.color} text-white rounded-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 flex items-center space-x-3 group border-2 border-white/20 shadow-lg`}
                           title={`${node.label}: ${node.description}\n\nComponent: ${node.component}\nHandles: ${node.handles.source ? 'Output' : ''}${node.handles.source && node.handles.target ? ' + ' : ''}${node.handles.target ? 'Input' : ''}\n\nClick to add or drag for precise placement`}
                         >
-                          <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center group-hover:bg-white/30 transition-colors shadow-sm">
-                            <IconComponent className="w-6 h-6" />
+                          <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center group-hover:bg-white/30 transition-colors shadow-sm flex-shrink-0">
+                            <IconComponent className="w-5 h-5" />
                           </div>
                           <div className="text-left flex-1 min-w-0">
-                            <div className="font-bold text-base">{node.label}</div>
-                            <div className="text-sm text-white/90 line-clamp-2 leading-relaxed">
+                            <div className="font-bold text-sm leading-tight">{node.label}</div>
+                            <div className="text-xs text-white/90 line-clamp-1 leading-tight mt-0.5">
                               {node.description}
                             </div>
-                            <div className="mt-2 flex items-center justify-between">
-                              <div className="flex items-center space-x-2">
-                                <div className="flex items-center space-x-1">
+                            <div className="mt-1.5 flex items-center justify-between">
+                              <div className="flex items-center space-x-1.5">
+                                <div className="flex items-center space-x-0.5">
                                   {node.handles.target && (
-                                    <div className="w-2 h-2 bg-white/60 rounded-full" title="Input handle" />
+                                    <div className="w-1.5 h-1.5 bg-white/60 rounded-full" title="Input handle" />
                                   )}
                                   {node.handles.source && (
-                                    <div className="w-2 h-2 bg-white rounded-full" title="Output handle" />
+                                    <div className="w-1.5 h-1.5 bg-white rounded-full" title="Output handle" />
                                   )}
                                 </div>
-                                <span className="text-xs text-white/70 font-semibold">
+                                <span className="text-[10px] text-white/70 font-semibold">
                                   {node.component}
                                 </span>
                               </div>
-                              <div className="text-xs text-white/60 font-medium bg-white/10 px-2 py-1 rounded-full">
+                              <div className="text-[9px] text-white/60 font-medium bg-white/10 px-1.5 py-0.5 rounded-full">
                                 {node.type.toUpperCase()}
                               </div>
                             </div>
@@ -1002,19 +1002,19 @@ const Toolbar = () => {
       </div>
 
       {/* Enhanced Footer */}
-      <div className="p-4 bg-gradient-to-r from-gray-50 to-gray-100 border-t border-gray-200">
-        <div className="flex items-center justify-between mb-3">
+      <div className="p-3.5 bg-gray-50 border-t-2 border-gray-200">
+        <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-sm font-bold text-gray-700">{totalAvailableNodes} nodes ready</span>
+              <div className="w-2.5 h-2.5 bg-indigo-400 rounded-full animate-pulse shadow-md shadow-indigo-300/30"></div>
+              <span className="text-xs font-extrabold text-gray-700">{totalAvailableNodes} ready</span>
             </div>
             <div className="w-px h-4 bg-gray-300"></div>
-            <div className="text-xs text-gray-500">
-              Based on existing components
+            <div className="text-[10px] text-gray-600 font-medium">
+              📦 Pro toolkit
             </div>
           </div>
-          <span className="text-xs text-gray-400 font-bold">Pro v3.2</span>
+          <span className="text-[10px] text-indigo-500 font-bold px-2.5 py-1 bg-white rounded-full shadow-sm">v3.2</span>
         </div>
         
       </div>
