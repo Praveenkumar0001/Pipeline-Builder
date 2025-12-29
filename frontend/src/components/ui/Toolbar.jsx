@@ -33,7 +33,7 @@ import {
 } from 'lucide-react';
 import useStore from '../../store/useStore';
 
-// Comprehensive node categories with existing and enhanced types
+// Comprehensive node categories with existing and types
 const nodeCategories = {
   'Core Nodes': [
     { 
@@ -315,7 +315,7 @@ const Toolbar = () => {
   const [newInputLabel, setNewInputLabel] = useState('');
   const [newOutputLabel, setNewOutputLabel] = useState('');
 
-  // Enhanced node positioning with collision detection
+  //node positioning with collision detection
   const calculateNodePosition = useCallback(() => {
     const gridSize = 25;
     const nodeWidth = 200;
@@ -787,7 +787,7 @@ const Toolbar = () => {
   // Main expanded view
   return (
     <div className="w-[380px] max-h-[88vh] bg-white/98 backdrop-blur-2xl border-2 border-indigo-100/50 rounded-3xl shadow-2xl overflow-hidden flex flex-col">
-      {/* Enhanced Header */}
+      {/*Header */}
       <div className="bg-indigo-500 p-4 relative overflow-hidden">
         <div className="absolute inset-0 bg-white/10"></div>
         <div className="relative z-10">
@@ -826,7 +826,7 @@ const Toolbar = () => {
             <div className="text-white/90 font-medium truncate">
               {nodes.length} active • {edges.length} edges • {totalAvailableNodes} available
             </div>
-            <div className="text-white/70 font-bold flex-shrink-0">v3.2</div>
+            <div className="text-white/70 font-bold flex-shrink-0">v1.0</div>
           </div>
         </div>
       </div>
@@ -873,7 +873,7 @@ const Toolbar = () => {
         </p>
       </div>
 
-      {/* Enhanced Search */}
+      {/* Search */}
       <div className="p-4 border-b-2 border-gray-100 bg-white">
         <div className="relative mb-2.5">
           <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-indigo-400 w-4 h-4" />
@@ -902,11 +902,11 @@ const Toolbar = () => {
               <span className="font-medium">{totalAvailableNodes} nodes available</span>
             )}
           </span>
-          <span className="text-gray-400 font-medium">Enhanced</span>
+          {/* <span className="text-gray-400 font-medium">Enhanced</span> */}
         </div>
       </div>
 
-      {/* Enhanced Categories */}
+      {/*Categories */}
       <div className="flex-1 overflow-y-auto">
         {Object.keys(filteredCategories).length === 0 ? (
           <div className="p-8 text-center">
@@ -927,7 +927,7 @@ const Toolbar = () => {
         ) : (
           Object.entries(filteredCategories).map(([category, categoryNodes]) => (
             <div key={category} className="border-b border-gray-50 last:border-b-0">
-              {/* Enhanced Category Header */}
+              {/*Category Header */}
               <button
                 onClick={() => toggleCategory(category)}
                 className="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 transition-all duration-300 group"
@@ -946,7 +946,7 @@ const Toolbar = () => {
                 }
               </button>
               
-              {/* Enhanced Category Nodes */}
+              {/* Category Nodes */}
               {expandedCategories.has(category) && (
                 <div className="pb-2">
                   {categoryNodes.map((node) => {
@@ -1001,7 +1001,7 @@ const Toolbar = () => {
         )}
       </div>
 
-      {/* Enhanced Footer */}
+      {/*Footer */}
       <div className="p-3.5 bg-gray-50 border-t-2 border-gray-200">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
@@ -1011,10 +1011,10 @@ const Toolbar = () => {
             </div>
             <div className="w-px h-4 bg-gray-300"></div>
             <div className="text-[10px] text-gray-600 font-medium">
-              📦 Pro toolkit
+              📦 toolkit
             </div>
           </div>
-          <span className="text-[10px] text-indigo-500 font-bold px-2.5 py-1 bg-white rounded-full shadow-sm">v3.2</span>
+          <span className="text-[10px] text-indigo-500 font-bold px-2.5 py-1 bg-white rounded-full shadow-sm">v1.0</span>
         </div>
         
       </div>

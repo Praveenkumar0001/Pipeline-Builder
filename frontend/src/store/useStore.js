@@ -1,3 +1,19 @@
+/**
+ * Zustand Store for Pipeline Builder
+ * Manages global state for nodes, edges, and pipeline operations
+ * 
+ * State Management:
+ * - nodes: Array of ReactFlow nodes
+ * - edges: Array of ReactFlow edges
+ * - deletedHistory: Stack for undo functionality
+ * 
+ * Actions:
+ * - Node operations: addNode, updateNodeData, selectAll
+ * - Edge operations: setEdges, onNodesChange, onEdgesChange
+ * - Delete operations: deleteSelected, deleteAll, undoDelete
+ * - Pipeline operations: exportPipeline, clearPipeline, validatePipeline
+ */
+
 import { create } from 'zustand';
 import { applyNodeChanges, applyEdgeChanges } from 'reactflow';
 
@@ -83,7 +99,7 @@ const useStore = create((set, get) => ({
     });
   },
 
-  // Enhanced addNode with proper deletable flags
+  // addNode with proper deletable flags
   addNode: (nodeType, position) => {
     const newNode = {
       id: `${nodeType}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
@@ -92,7 +108,7 @@ const useStore = create((set, get) => ({
       data: getDefaultNodeData(nodeType),
       draggable: true,
       selectable: true,
-      deletable: true, // Enable deletion
+      deletable: true,
       focusable: true,
     };
 
@@ -278,13 +294,13 @@ const useStore = create((set, get) => ({
     }));
   },
 
-  // Enhanced setEdges with proper edge properties
+  //setEdges with proper edge properties
   setEdges: (edgesOrFunction) => {
     if (typeof edgesOrFunction === 'function') {
       set((state) => {
         const newEdges = edgesOrFunction(state.edges);
         // Ensure all edges have proper deletion properties
-        const enhancedEdges = newEdges.map(edge => ({
+        const enEdges = newEdges.map(edge => ({
           ...edge,
           deletable: true,
           selectable: true,
@@ -292,12 +308,12 @@ const useStore = create((set, get) => ({
         }));
         
         return {
-          edges: enhancedEdges,
+          edges: enEdges,
           error: null
         };
       });
     } else {
-      const enhancedEdges = (Array.isArray(edgesOrFunction) ? edgesOrFunction : [])
+      const enEdges = (Array.isArray(edgesOrFunction) ? edgesOrFunction : [])
         .map(edge => ({
           ...edge,
           deletable: true,
@@ -306,7 +322,7 @@ const useStore = create((set, get) => ({
         }));
         
       set({ 
-        edges: enhancedEdges,
+        edges: enEdges,
         error: null
       });
     }

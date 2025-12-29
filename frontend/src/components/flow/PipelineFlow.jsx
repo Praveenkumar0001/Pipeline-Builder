@@ -40,7 +40,7 @@ import {
 } from 'lucide-react';
 import { create } from 'zustand';
 
-// Enhanced Zustand store
+// Zustand store
 const useStore = create((set, get) => ({
   nodes: [],
   edges: [],
@@ -216,7 +216,7 @@ const nodeCategories = {
   ]
 };
 
-// Enhanced connection styling
+// connection styling
 const connectionLineStyle = {
   strokeWidth: 3,
   stroke: '#6366f1',
@@ -239,7 +239,7 @@ const defaultEdgeOptions = {
   animated: true,
 };
 
-// Enhanced Toolbar Component
+// Toolbar Component
 const Toolbar = () => {
   const { addNode, nodes, edges } = useStore();
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -397,7 +397,7 @@ const Toolbar = () => {
   );
 };
 
-// Enhanced Submit Button Component
+//Submit Button Component
 const SubmitButton = () => {
   const { nodes, edges, clearPipeline, isLoading, setLoading, setError, error } = useStore();
   const [isExpanded, setIsExpanded] = useState(false);
@@ -531,7 +531,7 @@ const SubmitButton = () => {
   );
 };
 
-// Enhanced Pipeline Status
+// Pipeline Status
 const PipelineStatus = () => {
   const { nodes, edges } = useStore();
   const [isMinimized, setIsMinimized] = useState(false);

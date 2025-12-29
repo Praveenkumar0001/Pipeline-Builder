@@ -323,8 +323,8 @@ const SubmitButton = () => {
       const result = await submitPipeline();
       
       if (result) {
-        // Enhance result with local analytics
-        const enhancedResult = {
+        // result with local analytics
+        const enResult = {
           ...result,
           timestamp: new Date().toISOString(),
           has_input: stats.hasInput,
@@ -341,7 +341,7 @@ const SubmitButton = () => {
           }
         };
         
-        setPipelineResult(enhancedResult);
+        setPipelineResult(enResult);
         setShowResult(true);
         
         // Auto-hide modal after 30 seconds
@@ -355,7 +355,7 @@ const SubmitButton = () => {
     }
   };
 
-  // Enhanced download functionality
+  //download functionality
   const handleDownload = useCallback(async (format = 'json') => {
     if (!nodes || nodes.length === 0) {
       setError('Cannot export empty pipeline');
@@ -630,7 +630,7 @@ ${JSON.stringify(exportData.pipeline, null, 2)}
   return (
     <>
       <div className="bg-white/95 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-8 w-[90vw] max-w-4xl max-h-[80vh] overflow-y-auto">
-        {/* Enhanced Header */}
+        {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center space-x-4">
             <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-xl">
@@ -894,7 +894,7 @@ ${JSON.stringify(exportData.pipeline, null, 2)}
         </div>
       </div>
 
-      {/* Enhanced Result Modal */}
+      {/* Result Modal */}
       {showResult && pipelineResult && (
         <PipelineResultModal 
           result={pipelineResult} 
@@ -905,7 +905,7 @@ ${JSON.stringify(exportData.pipeline, null, 2)}
   );
 };
 
-// Enhanced Status Indicator Component
+// Status Indicator Component
 const StatusIndicator = ({ label, status, description }) => (
   <div className="flex items-center justify-between p-4 bg-white rounded-xl border border-gray-200 hover:shadow-md transition-all">
     <div className="flex-1">

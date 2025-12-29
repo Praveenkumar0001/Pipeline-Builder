@@ -18,7 +18,6 @@ import PipelineStatus from './components/ui/PipelineStatus';
 import useStore from './store/useStore';
 import DeleteToolbar from './components/ui/DeleteToolbar';
 import { nodeTypes } from './components/nodes/nodeTypes';
-// Import icons
 import {
   Save,
   Plus,
@@ -26,7 +25,22 @@ import {
   Zap
 } from 'lucide-react';
 
-// Enhanced connection styling
+/**
+ * Pipeline Builder - Main Application
+ * 
+ * A visual pipeline editor built with React and ReactFlow
+ * Allows users to create, connect, and analyze data workflows
+ * 
+ * Features:
+ * - Drag & drop node creation
+ * - Visual connection building
+ * - Duplicate connection prevention
+ * - Pipeline validation (DAG detection)
+ * - Save/load pipelines
+ * - 26+ node types
+ */
+
+//connection styling
 const connectionLineStyle = {
   strokeWidth: 3,
   stroke: '#818cf8',
@@ -120,7 +134,8 @@ const Flow = () => {
 
   const { screenToFlowPosition } = useReactFlow();
 
-  // Enhanced connection handler with duplicate prevention
+  // Handle new connections between nodes
+  // Prevents duplicates and self-loops
   const onConnect = useCallback(
     (params) => {
       console.log('Creating connection:', params);
@@ -165,7 +180,7 @@ const Flow = () => {
     [setEdges, edges]
   );
 
-  // Enhanced drag handlers
+  // drag handlers
   const onDragOver = useCallback((event) => {
     event.preventDefault();
     event.dataTransfer.dropEffect = 'move';
@@ -258,7 +273,7 @@ const Flow = () => {
           maxZoom={2}
           defaultViewport={{ x: 0, y: 0, zoom: 0.75 }}
         >
-          {/* Enhanced Background */}
+          {/* Background */}
           <Background 
             color="#9ca3af" 
             gap={30} 
@@ -270,7 +285,7 @@ const Flow = () => {
             variant="dots"
           />
 
-          {/* Enhanced Controls */}
+          {/*Controls */}
           <Controls 
             position="bottom-right"
             style={{

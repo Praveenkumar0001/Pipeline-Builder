@@ -61,7 +61,7 @@ export const nodeTypes = {
   documentGenerator: DocumentGeneratorNode,
 };
 
-// Enhanced node configurations for the toolbar
+//node configurations for the toolbar
 export const nodeConfigs = [
   // IO Nodes
   {

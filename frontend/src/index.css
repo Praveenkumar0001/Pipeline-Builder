@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Enhanced scrollbar styles */
+/* scrollbar styles */
 @layer utilities {
   .custom-scrollbar {
     scrollbar-width: thin;
@@ -57,7 +57,7 @@
   background: #6366f1;
 }
 
-/* ReactFlow enhanced styles */
+/* ReactFlow styles */
 .react-flow {
   background: transparent;
 }

@@ -77,7 +77,7 @@ const PipelineResultModal = ({ result, onClose }) => {
     <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
       <div className="w-[95vw] h-[90vh] max-w-[1600px] bg-white rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-300">
         
-        {/* Enhanced Header */}
+        {/* Header */}
         <div className={`bg-gradient-to-r ${theme.gradient} p-8 text-white relative overflow-hidden`}>
           <div className="absolute inset-0 bg-white/10 bg-[radial-gradient(circle_at_20%_50%,_white_0%,_transparent_50%)]"></div>
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent"></div>
@@ -163,7 +163,7 @@ const PipelineResultModal = ({ result, onClose }) => {
           </div>
         </div>
 
-        {/* Enhanced Tabs */}
+        {/* Tabs */}
         <div className="bg-white border-b-2 border-gray-100">
           <div className="px-8">
             <div className="flex space-x-0">
@@ -661,7 +661,7 @@ const PipelineResultModal = ({ result, onClose }) => {
           )}
         </div>
 
-        {/* Enhanced Footer */}
+        {/*Footer */}
         <div className="bg-white border-t-2 border-gray-100 px-8 py-6 flex justify-between items-center">
           <div className="flex items-center space-x-8">
             <div className="text-gray-600">
@@ -694,7 +694,7 @@ const PipelineResultModal = ({ result, onClose }) => {
   );
 };
 
-// Enhanced helper functions
+// helper functions
 function getComplexity(nodes, edges) {
   if (nodes === 0) return 'Empty';
   if (nodes <= 3 && edges <= 3) return 'Simple';

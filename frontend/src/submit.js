@@ -1,9 +1,16 @@
-// submit.js - Pipeline submission handler
 import useStore from './store/useStore';
-
 /**
- * Submit pipeline to backend for analysis
- * This function sends the nodes and edges to the /pipelines/parse endpoint
+ * Pipeline Submission Handler
+ * Handles communication with backend for pipeline analysis and DAG validation
+ * 
+ * Features:
+ * - Validates pipeline structure before submission
+ * - Sends nodes and edges to FastAPI backend
+ * - Comprehensive error handling with user-friendly messages
+ * - Timeout protection for long-running requests
+ * - DAG (Directed Acyclic Graph) validation
+ * 
+ * @returns {Promise<Object|null>} Analysis result or null on error
  */
 export const submitPipeline = async () => {
   const { nodes, edges, setLoading, setError, setPipelineResult } = useStore.getState();
@@ -17,7 +24,7 @@ export const submitPipeline = async () => {
     setLoading(true);
     setError(null);
 
-    // Send nodes and edges to backend /pipelines/parse endpoint
+    // Hit the backend API
     const response = await fetch('http://localhost:8000/pipelines/parse', {
       method: 'POST',
       headers: {
