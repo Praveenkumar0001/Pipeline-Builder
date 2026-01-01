@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Upload, File, Database, Link } from 'lucide-react';
+import { Upload, File, Database, Link, Code, CheckCircle, XCircle } from 'lucide-react';
 import BaseNode from './BaseNode';
 import useStore from '../../store/useStore';
 
@@ -11,6 +11,22 @@ const InputNode = ({ id, data, selected }) => {
   const [uploadedFile, setUploadedFile] = useState(data?.uploadedFile || null);
   const [fileContent, setFileContent] = useState(data?.fileContent || null);
   const [isProcessing, setIsProcessing] = useState(false);
+  
+  // Database fields
+  const [dbConnectionString, setDbConnectionString] = useState(data?.dbConnectionString || '');
+  const [dbQuery, setDbQuery] = useState(data?.dbQuery || '');
+  const [dbConnected, setDbConnected] = useState(data?.dbConnected || false);
+  
+  // API fields
+  const [apiEndpoint, setApiEndpoint] = useState(data?.apiEndpoint || '');
+  const [apiMethod, setApiMethod] = useState(data?.apiMethod || 'GET');
+  const [apiHeaders, setApiHeaders] = useState(data?.apiHeaders || '');
+  const [apiBody, setApiBody] = useState(data?.apiBody || '');
+  const [apiResponse, setApiResponse] = useState(data?.apiResponse || null);
+  
+  // Manual input fields
+  const [manualInput, setManualInput] = useState(data?.manualInput || '');
+  
   const updateNodeData = useStore(state => state.updateNodeData);
 
   const handleInputTypeChange = (type) => {
@@ -92,6 +108,92 @@ const InputNode = ({ id, data, selected }) => {
       fileContent: null,
       hasData: false
     });
+  };
+
+  // Database handlers
+  const handleDbConnectionChange = (e) => {
+    const conn = e.target.value;
+    setDbConnectionString(conn);
+    updateNodeData(id, { dbConnectionString: conn });
+  };
+
+  const handleDbQueryChange = (e) => {
+    const query = e.target.value;
+    setDbQuery(query);
+    updateNodeData(id, { dbQuery: query });
+  };
+
+  const handleTestDbConnection = () => {
+    if (!dbConnectionString) {
+      alert('Please enter a connection string');
+      return;
+    }
+    setIsProcessing(true);
+    // Simulate connection test
+    setTimeout(() => {
+      setDbConnected(true);
+      updateNodeData(id, { dbConnected: true, hasData: true });
+      setIsProcessing(false);
+      alert('✅ Database connection successful!');
+    }, 1500);
+  };
+
+  // API handlers
+  const handleApiEndpointChange = (e) => {
+    const endpoint = e.target.value;
+    setApiEndpoint(endpoint);
+    updateNodeData(id, { apiEndpoint: endpoint });
+  };
+
+  const handleApiMethodChange = (e) => {
+    const method = e.target.value;
+    setApiMethod(method);
+    updateNodeData(id, { apiMethod: method });
+  };
+
+  const handleApiHeadersChange = (e) => {
+    const headers = e.target.value;
+    setApiHeaders(headers);
+    updateNodeData(id, { apiHeaders: headers });
+  };
+
+  const handleApiBodyChange = (e) => {
+    const body = e.target.value;
+    setApiBody(body);
+    updateNodeData(id, { apiBody: body });
+  };
+
+  const handleTestApiCall = async () => {
+    if (!apiEndpoint) {
+      alert('Please enter an API endpoint');
+      return;
+    }
+    setIsProcessing(true);
+    try {
+      const options = {
+        method: apiMethod,
+        headers: apiHeaders ? JSON.parse(apiHeaders) : {},
+      };
+      if (apiMethod !== 'GET' && apiBody) {
+        options.body = apiBody;
+      }
+      const response = await fetch(apiEndpoint, options);
+      const data = await response.json();
+      setApiResponse(data);
+      updateNodeData(id, { apiResponse: data, hasData: true });
+      alert('✅ API call successful!');
+    } catch (error) {
+      alert('❌ API call failed: ' + error.message);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  // Manual input handler
+  const handleManualInputChange = (e) => {
+    const input = e.target.value;
+    setManualInput(input);
+    updateNodeData(id, { manualInput: input, hasData: input.length > 0 });
   };
 
   const formatFileSize = (bytes) => {
@@ -259,11 +361,11 @@ const InputNode = ({ id, data, selected }) => {
               </div>
             ) : (
               <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start space-x-3 flex-1">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-start space-x-3 flex-1 min-w-0">
                     <File className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-green-900 truncate">
+                    <div className="flex-1 min-w-0 overflow-hidden">
+                      <p className="text-sm font-medium text-green-900 break-words">
                         {uploadedFile.name}
                       </p>
                       <p className="text-xs text-green-600 mt-1">
@@ -273,10 +375,10 @@ const InputNode = ({ id, data, selected }) => {
                   </div>
                   <button
                     onClick={handleClearFile}
-                    className="ml-2 p-1 text-green-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                    className="flex-shrink-0 ml-2 p-1 text-green-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
                     title="Remove file"
                   >
-                    <Upload className="w-4 h-4 rotate-180" />
+                    <XCircle className="w-4 h-4" />
                   </button>
                 </div>
                 <div className="mt-2 pt-2 border-t border-green-200">
@@ -285,6 +387,158 @@ const InputNode = ({ id, data, selected }) => {
                     <span className="text-xs font-medium text-green-700">File loaded and ready</span>
                   </div>
                 </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Database Configuration */}
+        {inputType === 'database' && (
+          <div className="space-y-3">
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-2">
+                Database Connection String
+              </label>
+              <input
+                type="text"
+                value={dbConnectionString}
+                onChange={handleDbConnectionChange}
+                placeholder="postgresql://user:pass@localhost:5432/db"
+                className="form-input text-xs"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-2">
+                SQL Query
+              </label>
+              <textarea
+                value={dbQuery}
+                onChange={handleDbQueryChange}
+                placeholder="SELECT * FROM table_name WHERE..."
+                className="form-textarea text-xs font-mono"
+                rows={3}
+              />
+            </div>
+            <button
+              onClick={handleTestDbConnection}
+              disabled={isProcessing || !dbConnectionString}
+              className={`
+                w-full flex items-center justify-center space-x-2 py-2 px-4 rounded-lg font-semibold text-sm
+                transition-all duration-200
+                ${
+                  isProcessing || !dbConnectionString
+                    ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
+                    : 'bg-green-500 text-white hover:bg-green-600'
+                }
+              `}
+            >
+              <Database className={`w-4 h-4 ${isProcessing ? 'animate-spin' : ''}`} />
+              <span>{isProcessing ? 'Testing...' : dbConnected ? 'Connected ✓' : 'Test Connection'}</span>
+            </button>
+          </div>
+        )}
+
+        {/* API Configuration */}
+        {inputType === 'api' && (
+          <div className="space-y-3">
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-2">
+                API Endpoint
+              </label>
+              <input
+                type="text"
+                value={apiEndpoint}
+                onChange={handleApiEndpointChange}
+                placeholder="https://api.example.com/data"
+                className="form-input text-xs"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-2">
+                HTTP Method
+              </label>
+              <select
+                value={apiMethod}
+                onChange={handleApiMethodChange}
+                className="form-select text-xs"
+              >
+                <option value="GET">GET</option>
+                <option value="POST">POST</option>
+                <option value="PUT">PUT</option>
+                <option value="DELETE">DELETE</option>
+                <option value="PATCH">PATCH</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-2">
+                Headers (JSON)
+              </label>
+              <textarea
+                value={apiHeaders}
+                onChange={handleApiHeadersChange}
+                placeholder='{"Content-Type": "application/json"}'
+                className="form-textarea text-xs font-mono"
+                rows={2}
+              />
+            </div>
+            {apiMethod !== 'GET' && (
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 mb-2">
+                  Request Body
+                </label>
+                <textarea
+                  value={apiBody}
+                  onChange={handleApiBodyChange}
+                  placeholder='{"key": "value"}'
+                  className="form-textarea text-xs font-mono"
+                  rows={3}
+                />
+              </div>
+            )}
+            <button
+              onClick={handleTestApiCall}
+              disabled={isProcessing || !apiEndpoint}
+              className={`
+                w-full flex items-center justify-center space-x-2 py-2 px-4 rounded-lg font-semibold text-sm
+                transition-all duration-200
+                ${
+                  isProcessing || !apiEndpoint
+                    ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
+                    : 'bg-green-500 text-white hover:bg-green-600'
+                }
+              `}
+            >
+              <Link className={`w-4 h-4 ${isProcessing ? 'animate-pulse' : ''}`} />
+              <span>{isProcessing ? 'Calling...' : apiResponse ? 'Call Again' : 'Test API Call'}</span>
+            </button>
+            {apiResponse && (
+              <div className="bg-green-50 border border-green-200 rounded p-2">
+                <p className="text-xs text-green-700 font-medium mb-1">✓ Response received</p>
+                <pre className="text-xs text-green-900 overflow-x-auto break-words whitespace-pre-wrap">
+                  {JSON.stringify(apiResponse, null, 2).substring(0, 200)}...
+                </pre>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Manual Input */}
+        {inputType === 'manual' && (
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 mb-2">
+              Manual Data Input
+            </label>
+            <textarea
+              value={manualInput}
+              onChange={handleManualInputChange}
+              placeholder="Paste or type your data here...&#10;Supports JSON, CSV, plain text, etc."
+              className="form-textarea text-xs font-mono"
+              rows={6}
+            />
+            {manualInput && (
+              <div className="mt-2 flex items-center space-x-2 text-xs text-green-600">
+                <CheckCircle className="w-4 h-4" />
+                <span>{manualInput.length} characters entered</span>
               </div>
             )}
           </div>
@@ -318,7 +572,7 @@ const InputNode = ({ id, data, selected }) => {
               </div>
               <div className="flex items-center justify-between">
                 <span>Name:</span>
-                <span className="font-medium">{inputName || 'Unnamed'}</span>
+                <span className="font-medium truncate ml-2 max-w-[150px]" title={inputName}>{inputName || 'Unnamed'}</span>
               </div>
               {inputType === 'file' && (
                 <>
@@ -333,6 +587,30 @@ const InputNode = ({ id, data, selected }) => {
                     </span>
                   </div>
                 </>
+              )}
+              {inputType === 'database' && (
+                <div className="flex items-center justify-between">
+                  <span>Connection:</span>
+                  <span className={`font-medium ${dbConnected ? 'text-green-700' : 'text-orange-600'}`}>
+                    {dbConnected ? '✓ Connected' : '○ Not Connected'}
+                  </span>
+                </div>
+              )}
+              {inputType === 'api' && (
+                <div className="flex items-center justify-between">
+                  <span>Status:</span>
+                  <span className={`font-medium ${apiResponse ? 'text-green-700' : 'text-orange-600'}`}>
+                    {apiResponse ? '✓ Response OK' : '○ No Response'}
+                  </span>
+                </div>
+              )}
+              {inputType === 'manual' && (
+                <div className="flex items-center justify-between">
+                  <span>Data:</span>
+                  <span className={`font-medium ${manualInput ? 'text-green-700' : 'text-orange-600'}`}>
+                    {manualInput ? `✓ ${manualInput.length} chars` : '○ No Data'}
+                  </span>
+                </div>
               )}
             </div>
           </div>

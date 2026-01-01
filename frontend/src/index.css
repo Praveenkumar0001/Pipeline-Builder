@@ -255,6 +255,9 @@
   @apply focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500;
   @apply disabled:bg-gray-50 disabled:text-gray-500;
   @apply hover:border-gray-300 bg-white font-medium;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
 }
 
 .form-select {
@@ -272,6 +275,9 @@
   @apply focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500;
   @apply disabled:bg-gray-50 disabled:text-gray-500;
   @apply hover:border-gray-300 bg-white;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
 }
 
 .form-textarea {

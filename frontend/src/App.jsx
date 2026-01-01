@@ -305,31 +305,31 @@ const Flow = () => {
 
           {/* Header Panel */}
           <Panel position="top-center">
-            <div className="bg-white/98 backdrop-blur-2xl border-2 border-gray-200 rounded-3xl shadow-2xl px-10 py-6">
+            <div className="bg-white/98 backdrop-blur-2xl border-2 border-gray-200 rounded-2xl shadow-xl px-5 py-3">
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-6">
-                  <div className="flex items-center space-x-5">
-                    <div className="w-14 h-14 bg-indigo-500 rounded-2xl flex items-center justify-center shadow-lg ring-4 ring-indigo-50 transform hover:scale-110 transition-transform duration-300">
-                      <span className="text-white text-3xl">🚀</span>
+                <div className="flex items-center space-x-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-9 h-9 bg-indigo-500 rounded-xl flex items-center justify-center shadow-lg ring-2 ring-indigo-50 transform hover:scale-110 transition-transform duration-300">
+                      <span className="text-white text-xl">🚀</span>
                     </div>
                     <div>
-                      <h1 className="text-3xl font-extrabold text-gray-700">
+                      <h1 className="text-xl font-extrabold text-gray-700">
                         Pipeline Builder
                       </h1>
-                      <p className="text-sm text-gray-400 font-medium mt-0.5">Visual data pipeline creator & analyzer</p>
+                      <p className="text-xs text-gray-400 font-medium">Visual data pipeline creator & analyzer</p>
                     </div>
                   </div>
                   
                   {(nodes.length > 0 || edges.length > 0) && (
-                    <div className="flex items-center space-x-8 ml-10 pl-8 border-l-2 border-gray-100">
-                      <div className="flex items-center space-x-3 px-4 py-2 bg-gray-50 rounded-xl border border-gray-100">
-                        <div className="w-2.5 h-2.5 bg-indigo-400 rounded-full animate-pulse shadow-md shadow-indigo-300/30"></div>
-                        <span className="text-sm font-bold text-gray-700">{nodes.length}</span>
+                    <div className="flex items-center space-x-4 ml-6 pl-6 border-l-2 border-gray-100">
+                      <div className="flex items-center space-x-2 px-3 py-1.5 bg-gray-50 rounded-lg border border-gray-100">
+                        <div className="w-2 h-2 bg-indigo-400 rounded-full animate-pulse shadow-md shadow-indigo-300/30"></div>
+                        <span className="text-xs font-bold text-gray-700">{nodes.length}</span>
                         <span className="text-xs font-medium text-gray-500">nodes</span>
                       </div>
-                      <div className="flex items-center space-x-3 px-4 py-2 bg-gray-50 rounded-xl border border-gray-100">
-                        <div className="w-2.5 h-2.5 bg-indigo-400 rounded-full animate-pulse shadow-md shadow-indigo-300/30"></div>
-                        <span className="text-sm font-bold text-gray-700">{edges.length}</span>
+                      <div className="flex items-center space-x-2 px-3 py-1.5 bg-gray-50 rounded-lg border border-gray-100">
+                        <div className="w-2 h-2 bg-indigo-400 rounded-full animate-pulse shadow-md shadow-indigo-300/30"></div>
+                        <span className="text-xs font-bold text-gray-700">{edges.length}</span>
                         <span className="text-xs font-medium text-gray-500">connections</span>
                       </div>
                     </div>
@@ -338,9 +338,9 @@ const Flow = () => {
                 
                 <button
                   onClick={handleSavePipeline}
-                  className="flex items-center space-x-3 px-6 py-3 bg-indigo-500 text-white rounded-2xl font-bold hover:bg-indigo-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 ring-2 ring-indigo-100"
+                  className="flex items-center space-x-2 px-4 py-2 bg-indigo-500 text-white rounded-xl text-sm font-bold hover:bg-indigo-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 ring-2 ring-indigo-100"
                 >
-                  <Save className="w-5 h-5" />
+                  <Save className="w-4 h-4" />
                   <span>Save Pipeline</span>
                 </button>
               </div>

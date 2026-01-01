@@ -55,10 +55,12 @@ const BaseNode = memo(({
       style={{
         minWidth: `${minWidth}px`,
         maxWidth: `${maxWidth}px`,
+        width: 'fit-content',
         transform: selected ? 'scale(1.05)' : 'scale(1)',
         boxShadow: selected 
           ? '0 20px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 4px rgba(99, 102, 241, 0.2)'
-          : '0 10px 30px -5px rgba(0, 0, 0, 0.1)'
+          : '0 10px 30px -5px rgba(0, 0, 0, 0.1)',
+        overflow: 'hidden'
       }}
     >
       {/* Input Handles */}

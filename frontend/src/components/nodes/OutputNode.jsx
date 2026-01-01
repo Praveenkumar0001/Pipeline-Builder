@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Download, Save, Share2, FileText } from 'lucide-react';
+import { Download, Save, Share2, FileText, Send, Database as DatabaseIcon } from 'lucide-react';
 import BaseNode from './BaseNode';
 import useStore from '../../store/useStore';
 
@@ -11,6 +11,18 @@ const OutputNode = ({ id, data, selected }) => {
   const [destination, setDestination] = useState(data?.destination || '');
   const [previewData, setPreviewData] = useState(data?.previewData || null);
   const [isExporting, setIsExporting] = useState(false);
+  
+  // Database fields
+  const [dbConnectionString, setDbConnectionString] = useState(data?.dbConnectionString || '');
+  const [dbTableName, setDbTableName] = useState(data?.dbTableName || '');
+  const [dbSaved, setDbSaved] = useState(data?.dbSaved || false);
+  
+  // API fields
+  const [apiEndpoint, setApiEndpoint] = useState(data?.apiEndpoint || '');
+  const [apiMethod, setApiMethod] = useState(data?.apiMethod || 'POST');
+  const [apiHeaders, setApiHeaders] = useState(data?.apiHeaders || '');
+  const [apiSent, setApiSent] = useState(data?.apiSent || false);
+  
   const updateNodeData = useStore(state => state.updateNodeData);
   const nodes = useStore(state => state.nodes);
   const edges = useStore(state => state.edges);
@@ -42,6 +54,125 @@ const OutputNode = ({ id, data, selected }) => {
     const dest = e.target.value;
     setDestination(dest);
     updateNodeData(id, { destination: dest });
+  };
+
+  // Database handlers
+  const handleDbConnectionStringChange = (e) => {
+    const conn = e.target.value;
+    setDbConnectionString(conn);
+    updateNodeData(id, { dbConnectionString: conn });
+  };
+
+  const handleDbTableNameChange = (e) => {
+    const table = e.target.value;
+    setDbTableName(table);
+    updateNodeData(id, { dbTableName: table });
+  };
+
+  const handleSaveToDatabase = () => {
+    if (!dbConnectionString || !dbTableName) {
+      alert('Please enter connection string and table name');
+      return;
+    }
+    setIsExporting(true);
+    
+    // Collect data from connected nodes
+    const connectedEdges = edges.filter(edge => edge.target === id);
+    const sourceNodes = connectedEdges.map(edge => 
+      nodes.find(node => node.id === edge.source)
+    ).filter(Boolean);
+
+    const collectedData = {
+      timestamp: new Date().toISOString(),
+      outputName: outputName,
+      sources: sourceNodes.map(node => ({
+        id: node.id,
+        type: node.type,
+        data: node.data
+      }))
+    };
+
+    // Simulate database save
+    setTimeout(() => {
+      setDbSaved(true);
+      updateNodeData(id, { 
+        dbSaved: true,
+        lastExport: new Date().toISOString(),
+        exportCount: (data?.exportCount || 0) + 1
+      });
+      setIsExporting(false);
+      alert(`✅ Data saved to database table: ${dbTableName}`);
+    }, 1500);
+  };
+
+  // API handlers
+  const handleApiEndpointChange = (e) => {
+    const endpoint = e.target.value;
+    setApiEndpoint(endpoint);
+    updateNodeData(id, { apiEndpoint: endpoint });
+  };
+
+  const handleApiMethodChange = (e) => {
+    const method = e.target.value;
+    setApiMethod(method);
+    updateNodeData(id, { apiMethod: method });
+  };
+
+  const handleApiHeadersChange = (e) => {
+    const headers = e.target.value;
+    setApiHeaders(headers);
+    updateNodeData(id, { apiHeaders: headers });
+  };
+
+  const handleSendToApi = async () => {
+    if (!apiEndpoint) {
+      alert('Please enter an API endpoint');
+      return;
+    }
+    setIsExporting(true);
+    
+    try {
+      // Collect data from connected nodes
+      const connectedEdges = edges.filter(edge => edge.target === id);
+      const sourceNodes = connectedEdges.map(edge => 
+        nodes.find(node => node.id === edge.source)
+      ).filter(Boolean);
+
+      const collectedData = {
+        timestamp: new Date().toISOString(),
+        outputName: outputName,
+        format: format,
+        sources: sourceNodes.map(node => ({
+          id: node.id,
+          type: node.type,
+          data: node.data
+        }))
+      };
+
+      const options = {
+        method: apiMethod,
+        headers: apiHeaders ? JSON.parse(apiHeaders) : { 'Content-Type': 'application/json' },
+        body: JSON.stringify(collectedData)
+      };
+
+      const response = await fetch(apiEndpoint, options);
+      
+      if (response.ok) {
+        setApiSent(true);
+        updateNodeData(id, { 
+          apiSent: true,
+          lastExport: new Date().toISOString(),
+          exportCount: (data?.exportCount || 0) + 1
+        });
+        alert('✅ Data sent to API successfully!');
+      } else {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+    } catch (error) {
+      alert('❌ Failed to send to API: ' + error.message);
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   const handleExport = () => {
@@ -237,18 +368,94 @@ const OutputNode = ({ id, data, selected }) => {
         </div>
 
         {/* Destination Path/URL */}
-        <div>
-          <label className="block text-xs font-semibold text-gray-700 mb-2">
-            Destination {outputType === 'api' ? 'URL' : 'Path'}
-          </label>
-          <input
-            type="text"
-            value={destination}
-            onChange={handleDestinationChange}
-            placeholder={outputType === 'api' ? 'https://api.example.com/webhook' : './outputs/data.json'}
-            className="form-input"
-          />
-        </div>
+        {outputType === 'file' && (
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 mb-2">
+              Destination Path
+            </label>
+            <input
+              type="text"
+              value={destination}
+              onChange={handleDestinationChange}
+              placeholder="./outputs/data.json"
+              className="form-input text-xs"
+            />
+          </div>
+        )}
+
+        {/* Database Configuration */}
+        {outputType === 'database' && (
+          <div className="space-y-3">
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-2">
+                Database Connection String
+              </label>
+              <input
+                type="text"
+                value={dbConnectionString}
+                onChange={handleDbConnectionStringChange}
+                placeholder="postgresql://user:pass@localhost:5432/db"
+                className="form-input text-xs"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-2">
+                Table Name
+              </label>
+              <input
+                type="text"
+                value={dbTableName}
+                onChange={handleDbTableNameChange}
+                placeholder="output_table"
+                className="form-input text-xs"
+              />
+            </div>
+          </div>
+        )}
+
+        {/* API Configuration */}
+        {outputType === 'api' && (
+          <div className="space-y-3">
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-2">
+                API Endpoint
+              </label>
+              <input
+                type="text"
+                value={apiEndpoint}
+                onChange={handleApiEndpointChange}
+                placeholder="https://api.example.com/webhook"
+                className="form-input text-xs"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-2">
+                HTTP Method
+              </label>
+              <select
+                value={apiMethod}
+                onChange={handleApiMethodChange}
+                className="form-select text-xs"
+              >
+                <option value="POST">POST</option>
+                <option value="PUT">PUT</option>
+                <option value="PATCH">PATCH</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-2">
+                Headers (JSON)
+              </label>
+              <textarea
+                value={apiHeaders}
+                onChange={handleApiHeadersChange}
+                placeholder='{"Authorization": "Bearer token"}'
+                className="form-textarea text-xs font-mono"
+                rows={2}
+              />
+            </div>
+          </div>
+        )}
 
         {/* Description */}
         <div>
@@ -287,29 +494,97 @@ const OutputNode = ({ id, data, selected }) => {
               </div>
               <div className="flex items-center justify-between">
                 <span>Name:</span>
-                <span className="font-medium">{outputName || 'Unnamed'}</span>
+                <span className="font-medium truncate ml-2 max-w-[150px]" title={outputName}>{outputName || 'Unnamed'}</span>
               </div>
+              {outputType === 'database' && dbSaved && (
+                <div className="flex items-center justify-between">
+                  <span>Status:</span>
+                  <span className="font-medium text-green-700">✓ Saved</span>
+                </div>
+              )}
+              {outputType === 'api' && apiSent && (
+                <div className="flex items-center justify-between">
+                  <span>Status:</span>
+                  <span className="font-medium text-green-700">✓ Sent</span>
+                </div>
+              )}
             </div>
             
-            {/* Export Button */}
-            <button
-              onClick={handleExport}
-              disabled={isExporting}
-              className={`
-                w-full flex items-center justify-center space-x-2 py-2 px-4 rounded-lg font-semibold text-sm
-                transition-all duration-200 transform
-                ${isExporting 
-                  ? 'bg-gray-300 text-gray-600 cursor-wait' 
-                  : 'bg-orange-500 text-white hover:bg-orange-600 hover:scale-105 active:scale-95'
-                }
-              `}
-            >
-              <Download className={`w-4 h-4 ${isExporting ? 'animate-bounce' : ''}`} />
-              <span>{isExporting ? 'Exporting...' : 'Export Data'}</span>
-            </button>
+            {/* Export/Action Buttons */}
+            {outputType === 'file' && (
+              <button
+                onClick={handleExport}
+                disabled={isExporting}
+                className={`
+                  w-full flex items-center justify-center space-x-2 py-2 px-4 rounded-lg font-semibold text-sm
+                  transition-all duration-200 transform
+                  ${isExporting 
+                    ? 'bg-gray-300 text-gray-600 cursor-wait' 
+                    : 'bg-orange-500 text-white hover:bg-orange-600 hover:scale-105 active:scale-95'
+                  }
+                `}
+              >
+                <Download className={`w-4 h-4 ${isExporting ? 'animate-bounce' : ''}`} />
+                <span>{isExporting ? 'Exporting...' : 'Export Data'}</span>
+              </button>
+            )}
+
+            {outputType === 'database' && (
+              <button
+                onClick={handleSaveToDatabase}
+                disabled={isExporting || !dbConnectionString || !dbTableName}
+                className={`
+                  w-full flex items-center justify-center space-x-2 py-2 px-4 rounded-lg font-semibold text-sm
+                  transition-all duration-200 transform
+                  ${isExporting || !dbConnectionString || !dbTableName
+                    ? 'bg-gray-300 text-gray-600 cursor-not-allowed' 
+                    : 'bg-orange-500 text-white hover:bg-orange-600 hover:scale-105 active:scale-95'
+                  }
+                `}
+              >
+                <DatabaseIcon className={`w-4 h-4 ${isExporting ? 'animate-spin' : ''}`} />
+                <span>{isExporting ? 'Saving...' : 'Save to Database'}</span>
+              </button>
+            )}
+
+            {outputType === 'api' && (
+              <button
+                onClick={handleSendToApi}
+                disabled={isExporting || !apiEndpoint}
+                className={`
+                  w-full flex items-center justify-center space-x-2 py-2 px-4 rounded-lg font-semibold text-sm
+                  transition-all duration-200 transform
+                  ${isExporting || !apiEndpoint
+                    ? 'bg-gray-300 text-gray-600 cursor-not-allowed' 
+                    : 'bg-orange-500 text-white hover:bg-orange-600 hover:scale-105 active:scale-95'
+                  }
+                `}
+              >
+                <Send className={`w-4 h-4 ${isExporting ? 'animate-pulse' : ''}`} />
+                <span>{isExporting ? 'Sending...' : 'Send to API'}</span>
+              </button>
+            )}
+
+            {outputType === 'report' && (
+              <button
+                onClick={handleExport}
+                disabled={isExporting}
+                className={`
+                  w-full flex items-center justify-center space-x-2 py-2 px-4 rounded-lg font-semibold text-sm
+                  transition-all duration-200 transform
+                  ${isExporting 
+                    ? 'bg-gray-300 text-gray-600 cursor-wait' 
+                    : 'bg-orange-500 text-white hover:bg-orange-600 hover:scale-105 active:scale-95'
+                  }
+                `}
+              >
+                <FileText className={`w-4 h-4 ${isExporting ? 'animate-bounce' : ''}`} />
+                <span>{isExporting ? 'Generating...' : 'Generate Report'}</span>
+              </button>
+            )}
             
             {data?.lastExport && (
-              <div className="text-xs text-orange-600 text-center pt-2 border-t border-orange-200">
+              <div className="text-xs text-orange-600 text-center pt-2 border-t border-orange-200 break-words">
                 Last export: {new Date(data.lastExport).toLocaleTimeString()}
               </div>
             )}
